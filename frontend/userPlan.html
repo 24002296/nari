@@ -1,0 +1,114 @@
+
+<!DOCTYPE html>
+<script>
+const token = localStorage.getItem("token");
+if (!token) {
+    window.location.href = "index.html";
+}
+
+async function checkUser() {
+    const res = await fetch("http://127.0.0.1:5000/api/me", {
+        headers: { Authorization: "Bearer " + token }
+    });
+
+    if (!res.ok) {
+        window.location.href = "index.html";
+        return;
+    }
+
+    const user = await res.json();
+
+    if (user.plan && user.subscription_end) {
+        const endDate = new Date(user.subscription_end);
+        if (endDate > new Date()) {
+            window.location.href = "page2.html";
+        }
+    }
+}
+
+checkUser();
+
+</script>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Subscription - NARI MARKETS</title>
+<link rel="stylesheet" href="style4.css">
+</head>
+<body>
+
+<div class="overlay">
+    <h3>NARI MARKETS</h3>
+    <div class="main" id="subscriptionContainer"></div>
+</div>
+
+<script>
+
+if (!token) {
+    alert("Please login first");
+    window.location.href = "index.html";
+}
+
+async function subscribe(plan) {
+    const res = await fetch("http://127.0.0.1:5000/api/subscribe", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({ plan })
+    });
+
+    const data = await res.json();
+    if (!res.ok) {
+        alert(data.message || "Subscription failed");
+        return;
+    }
+
+    alert("Subscription successful!");
+    window.location.href = "page2.html";
+}
+
+const container = document.getElementById("subscriptionContainer");
+container.innerHTML = `
+    <div class="plan basic">
+        <h2>Basic</h2>
+        <button onclick="subscribe('Basic')">Subscribe R2000</button>
+    </div>
+    <div class="plan standard">
+        <h2>Standard</h2>
+        <button onclick="subscribe('Standard')">Subscribe R3500</button>
+    </div>
+    <div class="plan premium">
+        <h2>Premium</h2>
+        <button onclick="subscribe('Premium')">Subscribe R5000</button>
+    </div>
+`;
+</script>
+
+
+</body>
+
+<footer class="footer">
+    <div class="footer-content">
+
+        <h2>NARI MARKETS</h2>
+
+        <p class="footer-text">Managed & Supervised by:</p>
+
+        <p class="admin-info">
+            <strong>Admin Name:</strong> NARI MARKETS Admin<br>
+            <strong>Email:</strong> admin@narimarkets.com<br>
+            <strong>Role:</strong> Platform Owner & Verification Manager
+        </p>
+
+        <div class="footer-bottom">
+            © 2025 NARI MARKETS — All Rights Reserved
+        </div>
+
+    </div>
+</footer>
+
+</html>

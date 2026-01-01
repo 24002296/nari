@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NARI MARKETS Login</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://kit.fontawesome.com/17e7b993bf.js" crossorigin="anonymous"></script>
+</head>
+<body>
+
+    <video class="backgroudvideo" autoplay loop muted>
+        <source src="video1.mp4" type="video/mp4">
+    </video>
+
+    <div class="overlay">
+        <h3>NARI MARKETS</h3>
+        <form id="loginForm">
+            <div class="box">
+                <h3>Sign In</h3>
+                <div class="inside">
+                    <p>Stay on the BLUES with US</p>
+
+                    <!-- Role selection -->
+                    <div class="role-selection">
+                        <label>
+                            <input type="radio" name="role" value="client" checked> Client
+                        </label>
+                        <label>
+                            <input type="radio" name="role" value="admin"> Admin
+                        </label>
+                    </div>
+
+                    <div class="email-mrg">
+                        <label for="email">Email</label><br>
+                        <input class="text" type="email" placeholder="Berlin@gmail.com" required>
+                    </div>
+
+                    <div class="passwordmrg">
+                        <label for="password">Password</label><br>
+                        <input class="pass" type="password" placeholder="Password" required>
+                    </div>
+
+                    <input class="checkbox" type="checkbox">
+                    <label class="me">Remember me</label>
+                    <a class="password" href="password.html">Forgot password?</a>
+                    <br>
+
+                    <button type="submit" class="btn-login">Sign In</button>
+
+                    <div class="line-container">
+                        <span class="line"></span>
+                        <span class="Text">or</span>
+                        <span class="line"></span>
+                    </div>
+
+                    <a href="page1.html">
+                        <button type="button" class="Apple"><i class="fa-brands fa-apple"></i> Sign in with Apple</button>
+                    </a>
+
+                    <h4>New to BERLIN_ENTERPRISE? <a href="page1.html" class="join">Join now</a></h4>
+                </div>
+            </div>
+        </form>
+    </div>
+
+<script>
+const loginForm = document.getElementById("loginForm");
+const API = import.meta.env.VITE_API_URL;
+
+fetch(`${API}/api/login`);
+
+loginForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const role = document.querySelector('input[name="role"]:checked').value;
+    const email = document.querySelector(".text").value.trim();
+    const password = document.querySelector(".pass").value.trim();
+
+    try {
+        fetch("https://nari-12.onrender.com/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            email,
+            password,
+            role
+        })
+        
+
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+            alert(data.message || "Login failed");
+            return;
+        }
+
+       // SAVE TOKEN
+        localStorage.setItem("token", data.token);
+
+        // ROLE CHECK
+        if (data.user.role === "admin") {
+            window.location.href = "admin.html";
+            return;
+        }
+
+        // 🔒 NOT APPROVED
+        if (!data.user.approved) {
+            alert("Account pending approval");
+            localStorage.removeItem("token");
+            return;
+        }
+
+        // ✅ APPROVED BUT NO PLAN
+        if (!data.user.plan || !data.user.subscription_end) {
+            window.location.href = "userPlan.html";
+            return;
+        }
+
+        // ✅ ACTIVE SUBSCRIPTION
+        const endDate = new Date(data.user.subscription_end);
+        if (endDate < new Date()) {
+            window.location.href = "userPlan.html";
+            return;
+        }
+
+        window.location.href = "page2.html";
+
+    } catch (err) {
+        alert("Server error. Please try again.");
+        console.error(err);
+    }
+});
+</script>
+
+
+
+</body>
+
+</html>

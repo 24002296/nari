@@ -1,0 +1,94 @@
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #0d0d0d;
+    color: white;
+    display: flex;
+    justify-content: center;
+    padding-top: 60px;
+}
+
+
+form {
+    width: 90%;
+    max-width: 380px;
+    background: rgba(255, 255, 255, 0.07);
+    padding: 28px;
+    border-radius: 15px;
+    text-align: center;
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+
+form h3 {
+    font-size: 26px;
+    font-weight: bold;
+    letter-spacing: 2px;
+    margin-bottom: 25px;
+}
+
+
+.topic h2 {
+    font-size: 22px;
+    margin-bottom: 8px;
+}
+
+.sub p {
+    font-size: 14px;
+    opacity: 0.85;
+    margin-bottom: 20px;
+}
+
+
+.email {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: none;
+    outline: none;
+    font-size: 15px;
+    margin-bottom: 18px;
+}
+
+
+.continue {
+    width: 100%;
+    padding: 12px;
+    background: gold;
+    color: black;
+    font-weight: bold;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.continue:hover {
+    transform: scale(1.05);
+    background: #ffdf55;
+}
+
+
+.continue a {
+    color: black;
+    text-decoration: none;
+    display: block;
+}
+
+
+@media (max-width: 600px) {
+    form {
+        padding: 22px;
+    }
+
+    form h3 {
+        font-size: 22px;
+    }
+}

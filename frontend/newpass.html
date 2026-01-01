@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style3.css">
+    <title>Reset Password</title>
+</head>
+<body>
+
+<form id="resetForm">
+    <video class="backgroudvideo" autoplay loop>
+        <source src="video2.mp4" type="video/mp4">
+    </video>
+
+    <div class="overlay">
+        <h3>BERLIN ENTERPRISE</h3>
+
+        <div class="main">
+            <div class="topic">
+                <h2>New Password</h2>
+            </div>
+
+            <div class="sub">
+                <p>Please create a new password that you don't use on any other site</p>
+            </div>
+
+            <div class="box1">
+                <input id="newpass" class="newpass" type="password" placeholder="New password" required>
+                <br>
+                <input id="confpass" class="confpass" type="password" placeholder="Confirm password" required>
+                <br>
+            </div>
+
+            <button class="submit" type="submit">Submit</button>
+        </div>
+    </div>
+</form>
+
+<script>
+
+document.getElementById("resetForm").addEventListener("submit", function(e){
+    e.preventDefault();
+
+    let newPass = document.getElementById("newpass").value;
+    let confPass = document.getElementById("confpass").value;
+
+    if (newPass !== confPass) {
+        alert("Passwords do not match!");
+        return;
+    }
+
+    
+    let email = localStorage.getItem("resetEmail");
+    if (!email) {
+        alert("Session expired. Restart password reset.");
+        window.location.href = "password.html";
+        return;
+    }
+
+    
+    let users = JSON.parse(localStorage.getItem("users")) || [];
+
+    
+    users = users.map(user => {
+        if (user.email === email) {
+            user.password = newPass;
+        }
+        return user;
+    });
+
+    
+    localStorage.setItem("users", JSON.stringify(users));
+
+    
+    localStorage.removeItem("resetEmail");
+
+    alert("Password successfully changed! Please log in.");
+
+    
+    window.location.href = "index.html";
+});
+</script>
+
+
+</body>
+
+</html>

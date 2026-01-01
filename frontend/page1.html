@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign Up - NARI MARKETS</title>
+<link rel="stylesheet" href="style1.css">
+<script src="https://kit.fontawesome.com/17e7b993bf.js" crossorigin="anonymous"></script>
+</head>
+
+<body>
+
+<form id="signupForm">
+    <video class="backgroundvideo" autoplay loop muted>
+        <source src="video2.mp4" type="video/mp4">
+    </video>
+
+    <div class="overlay">
+        <h3>NARI MARKETS</h3>
+        <div class="box2">
+            <input class="name" type="text" placeholder="Name" required><br>
+            <input class="surname" type="text" placeholder="Surname" required><br>
+            <input class="email" type="email" placeholder="Email" required><br>
+            <input class="password" type="password" placeholder="Password" required><br>
+            <input class="pass2" type="password" placeholder="Confirm Password" required><br>
+
+            <label>
+                <input class="checkbox" type="checkbox" required> I agree to the <a href="T&C.html">terms and conditions</a>
+            </label><br>
+
+            <button type="submit" class="Signup">Sign Up</button>
+        </div>
+    </div>
+</form>
+
+<script>
+document.getElementById("signupForm").addEventListener("submit", async function(e){
+    e.preventDefault();
+
+    const name = document.querySelector(".name").value;
+    const surname = document.querySelector(".surname").value;
+    const email = document.querySelector(".email").value;
+    const password = document.querySelector(".password").value;
+    const pass2 = document.querySelector(".pass2").value;
+
+    if(password !== pass2){
+        return alert("Passwords do not match!");
+    }
+
+    // SEND TO BACKEND 🔥
+    const res = await fetch("http://127.0.0.1:5000/api/register", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ name, surname, email, password })
+    });
+
+    const data = await res.json();
+
+    if(data.success){
+        alert("Registration Complete! Wait for Admin Approval.");
+        window.location.href = "index.html";
+    } else {
+        alert(data.message);
+    }
+});
+</script>
+
+</body>
+</html>

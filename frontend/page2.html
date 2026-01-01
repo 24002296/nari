@@ -1,0 +1,119 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Welcome - NARI MARKETS</title>
+<link rel="stylesheet" href="style7.css">
+<link rel="stylesheet" href="footer.css"> <!-- FOOTER CSS -->
+</head>
+<body>
+
+<!-- Particle background -->
+<canvas id="particleCanvas"></canvas>
+
+<div class="welcome-container">
+    <h1>Welcome Back, Trader!</h1>
+    <p class="subtitle">Your subscription plan: <span id="userPlan">-</span></p>
+    <p class="countdown">Subscription ends in: <span id="subscriptionTimer">Loading...</span></p>
+
+    <p class="quote" id="dailyQuote">Loading tip of the day...</p>
+
+    <button class="enter-btn" id="goToSignalsBtn">Go to Signals</button>
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+    <div class="footer-content">
+
+        <h2>NARI MARKETS</h2>
+
+        <p class="footer-text">Managed & Supervised by:</p>
+
+        <p class="admin-info">
+            <strong>Admin Name:</strong> NARI MARKETS Admin<br>
+            <strong>Email:</strong> admin@narimarkets.com<br>
+            <strong>Role:</strong> Platform Owner & Verification Manager
+        </p>
+
+        <div class="footer-bottom">
+            © 2025 NARI MARKETS — All Rights Reserved
+        </div>
+
+    </div>
+</footer>
+
+<script>
+async function loadPage() {
+    const token = localStorage.getItem("token");
+    if (!token) {
+        window.location.href = "index.html";
+        return;
+    }
+
+    const res = await fetch("http://127.0.0.1:5000/api/me", {
+        headers: {
+            Authorization: "Bearer " + token
+        }
+    });
+
+    if (!res.ok) {
+        window.location.href = "index.html";
+        return;
+    }
+
+    const user = await res.json();
+
+    // ✅ Correct subscription check
+    if (!user.plan || !user.subscription_end) {
+        window.location.href = "userPlan.html";
+        return;
+    }
+
+    const endDate = new Date(user.subscription_end);
+    if (endDate < new Date()) {
+        window.location.href = "userPlan.html";
+        return;
+    }
+
+    // ✅ Show plan
+    document.getElementById("userPlan").textContent = user.plan;
+
+    // ✅ Countdown
+    startCountdown(endDate);
+
+    // ✅ Button works now
+    document.getElementById("goToSignalsBtn").onclick = () => {
+        window.location.href = "signal.html";
+    };
+}
+
+function startCountdown(endDate) {
+    function update() {
+        const diff = endDate - new Date();
+        if (diff <= 0) {
+            document.getElementById("subscriptionTimer").textContent = "Expired";
+            return;
+        }
+
+        const d = Math.floor(diff / 86400000);
+        const h = Math.floor((diff / 3600000) % 24);
+        const m = Math.floor((diff / 60000) % 60);
+        const s = Math.floor((diff / 1000) % 60);
+
+        document.getElementById("subscriptionTimer").textContent =
+            `${d}d ${h}h ${m}m ${s}s`;
+    }
+
+    update();
+    setInterval(update, 1000);
+}
+
+loadPage();
+</script>
+
+</body>
+</html>

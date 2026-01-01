@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your Signals - NARI MARKETS</title>
+
+<link rel="stylesheet" href="style6.css">
+
+
+</head>
+<body>
+
+<div class="overlay">
+    <h3>NARI MARKETS - Your Signals</h3>
+
+    <div id="signalsContainer" class="signals-grid"></div>
+
+</div>
+
+
+
+
+<!-- BACK TO LOGIN BUTTON -->
+<button class="back-login-btn" onclick="window.location.href='index.html'">
+    Back to Login
+</button>
+
+<script>
+const API_BASE = "http://127.0.0.1:5000/api";
+const token = localStorage.getItem("token");
+
+if (!token) {
+    alert("Please login");
+    window.location.href = "index.html";
+}
+
+function authHeaders() {
+    return {
+        "Authorization": "Bearer " + token
+    };
+}
+
+async function loadSignals() {
+    const container = document.getElementById("signalsContainer");
+    container.innerHTML = "<p>Loading signals...</p>";
+
+    const res = await fetch(`${API_BASE}/signals`, {
+        headers: authHeaders()
+    });
+
+    if (!res.ok) {
+        container.innerHTML = "<p>Failed to load signals</p>";
+        return;
+    }
+
+    const signals = await res.json();
+
+    if (signals.length === 0) {
+        container.innerHTML = "<p>No signals available</p>";
+        return;
+    }
+
+    container.innerHTML = "";
+
+    signals.forEach(s => {
+        container.innerHTML += `
+            <div class="signal-card" onclick="toggleLots(${s.id})">
+                <h3>${s.pair}</h3>
+                <p>Entry: ${s.entry}</p>
+                <p>TP: ${s.tp}</p>
+                <p>SL: ${s.sl}</p>
+
+                <div class="lot-box" id="lots-${s.id}" style="display:none">
+                    ${renderLots(s.lots)}
+                </div>
+            </div>
+        `;
+    });
+}
+
+function renderLots(lots) {
+    if (!lots || lots.length === 0) {
+        return "<p>No lot sizes provided</p>";
+    }
+
+    return lots.map(l => `
+        <div class="lot-row">
+            <strong>${l.lot_size} Lot</strong><br>
+            Win: R${l.win_amount} <br>
+            Loss: R${l.loss_amount}
+        </div>
+    `).join("");
+}
+
+function toggleLots(id) {
+    const box = document.getElementById(`lots-${id}`);
+    box.style.display = box.style.display === "none" ? "block" : "none";
+}
+
+document.addEventListener("DOMContentLoaded", loadSignals);
+
+</script>
+
+</body>
+
+</html>

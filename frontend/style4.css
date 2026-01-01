@@ -1,0 +1,152 @@
+/* RESET */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* PAGE BACKGROUND */
+body {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #0f172a, #020617);
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+}
+
+/* OVERLAY CONTAINER */
+.overlay {
+    flex: 1;
+    padding: 40px 20px;
+    text-align: center;
+}
+
+/* BRAND */
+.overlay h3 {
+    font-size: 26px;
+    letter-spacing: 2px;
+    margin-bottom: 30px;
+    color: #38bdf8;
+}
+
+/* PLANS CONTAINER */
+.main {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 25px;
+    max-width: 1000px;
+    margin: auto;
+}
+
+/* PLAN CARD */
+.plan {
+    background: #020617;
+    border-radius: 14px;
+    padding: 30px 20px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+    border: 1px solid #1e293b;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.plan:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 25px 60px rgba(0,0,0,0.8);
+}
+
+/* PLAN TITLE */
+.plan h2 {
+    font-size: 22px;
+    margin-bottom: 20px;
+}
+
+/* BUTTON */
+.plan button {
+    width: 100%;
+    padding: 14px;
+    font-size: 16px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.3s ease;
+}
+
+/* PLAN COLORS */
+.plan.basic {
+    border-top: 4px solid #38bdf8;
+}
+
+.plan.basic button {
+    background: #38bdf8;
+    color: #020617;
+}
+
+.plan.standard {
+    border-top: 4px solid #22c55e;
+}
+
+.plan.standard button {
+    background: #22c55e;
+    color: #020617;
+}
+
+.plan.premium {
+    border-top: 4px solid #facc15;
+}
+
+.plan.premium button {
+    background: #facc15;
+    color: #020617;
+}
+
+/* BUTTON HOVER */
+.plan button:hover {
+    opacity: 0.85;
+    transform: scale(1.03);
+}
+
+/* FOOTER */
+.footer {
+    background: #020617;
+    padding: 30px 15px;
+    text-align: center;
+    border-top: 1px solid #1e293b;
+}
+
+.footer h2 {
+    color: #38bdf8;
+    margin-bottom: 10px;
+}
+
+.footer-text {
+    margin-bottom: 10px;
+    font-size: 14px;
+    color: #94a3b8;
+}
+
+.admin-info {
+    font-size: 13px;
+    color: #cbd5f5;
+    margin-bottom: 15px;
+}
+
+.footer-bottom {
+    font-size: 12px;
+    color: #64748b;
+}
+
+/* MOBILE */
+@media (max-width: 600px) {
+    .overlay h3 {
+        font-size: 22px;
+    }
+
+    .plan h2 {
+        font-size: 20px;
+    }
+
+    .plan button {
+        font-size: 15px;
+    }
+}

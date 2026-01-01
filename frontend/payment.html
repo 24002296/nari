@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Payment - NARI MARKETS</title>
+<link rel="stylesheet" href="style5.css">
+</head>
+<body>
+
+<div class="main">
+    <h3>Payment</h3>
+
+    <div class="card-icon" id="cardIcon"></div>
+
+    <form id="paymentForm">
+
+        <label>Card Number</label>
+        <input type="text" id="cardNumber" maxlength="19" placeholder="xxxx xxxx xxxx xxxx" required>
+
+        <div class="row">
+            <div>
+                <label>Expiry</label>
+                <input type="month" required>
+            </div>
+            <div>
+                <label>CVV</label>
+                <input type="password" maxlength="4" placeholder="***" required>
+            </div>
+        </div>
+
+        <label>Name on Card</label>
+        <input type="text" placeholder="Full name" required>
+
+        <button type="submit">Pay Securely</button>
+    </form>
+</div>
+
+<script>
+const userEmail = localStorage.getItem("loggedInUser");
+if(!userEmail){
+    alert("Please login first.");
+    window.location.href = "index.html";
+}
+
+let users = JSON.parse(localStorage.getItem("users")) || [];
+let currentUser = users.find(u => u.email === userEmail);
+
+const selectedPlan = localStorage.getItem("selectedPlan");
+if(!selectedPlan){
+    alert("Select a plan first.");
+    window.location.href = "userPlan.html";
+}
+
+
+document.getElementById("cardNumber").addEventListener("input", function() {
+    const value = this.value.replace(/\D/g, "");
+    const icon = document.getElementById("cardIcon");
+
+    if (value.startsWith("4")) {
+        icon.innerHTML = "💳 VISA";
+        icon.style.color = "#00eaff";
+    } else if (/^5[1-5]/.test(value)) {
+        icon.innerHTML = "💳 MASTERCARD";
+        icon.style.color = "#ffb700";
+    } else {
+        icon.innerHTML = "";
+    }
+
+    
+    this.value = value.replace(/(.{4})/g, "$1 ").trim();
+});
+
+
+document.getElementById("paymentForm").addEventListener("submit", function(e){
+    e.preventDefault();
+
+    const startDate = new Date();
+    const endDate = new Date();
+    endDate.setDate(startDate.getDate() + 30);
+
+    currentUser.subscription = {
+        plan: selectedPlan,
+        startDate: startDate.toISOString(),
+        endDate: endDate.toISOString()
+    };
+
+    localStorage.setItem("users", JSON.stringify(users));
+
+    alert(`Subscription for ${selectedPlan} activated successfully!`);
+    window.location.href = "signal.html";
+});
+
+</script>
+
+</body>
+
+</html>
