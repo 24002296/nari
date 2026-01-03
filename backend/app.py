@@ -93,38 +93,55 @@ def create_app():
 
     @app.post("/api/login")
     def login():
-        try:
-            data = request.get_json()
-            print("LOGIN DATA:", data)
+        data = request.get_json()
 
-            email = data.get("email")
-            password = data.get("password")
-            role = data.get("role")
+        if not data:
+            return jsonify({"message": "No data provided"}), 400
 
-            user = User.query.filter_by(email=email, role=role).first()
-            print("USER FOUND:", user)
+        email = data.get("email")
+        password = data.get("password")
+        role = data.get("role")
 
-            if not user:
-                return jsonify({"message": "Invalid credentials"}), 401
+        if not email or not password or not role:
+            return jsonify({"message": "Missing fields"}), 400
 
-            if not check_password_hash(user.password_hash, password):
-                return jsonify({"message": "Invalid credentials"}), 401
+        user = User.query.filter_by(email=email, role=role).first()
 
-            token = generate_token(user.id, user.role)
-            print("TOKEN GENERATED")
+        if not user:
+            return jsonify({"message": "Invalid credentials"}), 401
 
+        if not check_password_hash(user.password_hash, password):
+            return jsonify({"message": "Invalid credentials"}), 401
+
+        # ADMIN LOGIN
+        if role == "admin":
+            token = generate_token(user.id, "admin")
             return jsonify({
                 "token": token,
                 "user": {
                     "id": user.id,
                     "email": user.email,
-                    "role": user.role
+                    "role": "admin"
                 }
             }), 200
 
-        except Exception as e:
-            print("LOGIN ERROR:", str(e))
-            return jsonify({"error": str(e)}), 500
+        # CLIENT LOGIN
+        if not user.approved:
+            return jsonify({"message": "Account pending approval"}), 403
+
+        token = generate_token(user.id, "client")
+
+        return jsonify({
+            "token": token,
+            "user": {
+                "id": user.id,
+                "email": user.email,
+                "role": "client",
+                "plan": user.plan,
+                "subscription_end": user.subscription_end.isoformat() if user.subscription_end else None
+            }
+        }), 200
+
 
     # ---------------- CURRENT USER ----------------
     @app.get("/api/me")
@@ -432,5 +449,4 @@ app = create_app()
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
-
 
