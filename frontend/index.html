@@ -64,7 +64,7 @@
         </form>
     </div>
 
-<script type="module">
+<script>
 const loginForm = document.getElementById("loginForm");
 const API_URL = "https://nari-15.onrender.com";
 
@@ -83,7 +83,9 @@ loginForm.addEventListener("submit", async (e) => {
     try {
         const res = await fetch(`${API_URL}/api/login`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+                "Content-Type": "application/json"
+            },
             body: JSON.stringify({ email, password, role })
         });
 
@@ -94,36 +96,30 @@ loginForm.addEventListener("submit", async (e) => {
             return;
         }
 
-        // SAVE TOKEN
         localStorage.setItem("token", data.token);
 
-        // ADMIN
         if (data.user.role === "admin") {
             window.location.href = "admin.html";
             return;
         }
 
-        // NOT APPROVED
         if (!data.user.approved) {
-            alert("Account pending approval");
+            alert("Account pending admin approval");
             localStorage.removeItem("token");
             return;
         }
 
-        // NO PLAN
         if (!data.user.plan || !data.user.subscription_end) {
             window.location.href = "userPlan.html";
             return;
         }
 
-        // EXPIRED PLAN
         const endDate = new Date(data.user.subscription_end);
         if (endDate < new Date()) {
             window.location.href = "userPlan.html";
             return;
         }
 
-        // SUCCESS
         window.location.href = "page2.html";
 
     } catch (err) {
@@ -139,3 +135,4 @@ loginForm.addEventListener("submit", async (e) => {
 
 
 </html>
+
