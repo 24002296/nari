@@ -82,80 +82,74 @@ def create_app():
     
 
 
-    @app.post("/api/login")
+       @app.post("/api/login")
     def login():
-        data = request.json
-        email = data.get("email")
-        password = data.get("password")
-        role = data.get("role")
+        try:
+            data = request.get_json()
+            if not data:
+                return jsonify({"message": "Invalid JSON"}), 400
 
-        user = User.query.filter_by(email=email, role=role).first()
+            email = data.get("email")
+            password = data.get("password")
+            role = data.get("role")
 
-        if not user:
-            return jsonify({"message": "Invalid credentials"}), 401
+            if not email or not password or not role:
+                return jsonify({"message": "Missing fields"}), 400
 
-        if not check_password_hash(user.password_hash, password):
-            return jsonify({"message": "Invalid credentials"}), 401
+            # ================= ADMIN LOGIN =================
+            if role == "admin":
+                if (
+                    email != os.getenv("ADMIN_EMAIL") or
+                    password != os.getenv("ADMIN_PASSWORD")
+                ):
+                    return jsonify({"message": "Invalid admin credentials"}), 401
 
-        token = generate_token(user.id, user.role)
+                admin = User.query.filter_by(email=email, role="admin").first()
+                if not admin:
+                    return jsonify({"message": "Admin account not found"}), 404
 
-        return jsonify({
-            "token": token,
-            "user": {
-                "id": user.id,
-                "name": user.name,
-                "email": user.email,
-                "role": user.role,
-                "approved": user.approved,  # ✅ IMPORTANT
-                "plan": user.plan,
-                "subscription_end": user.subscription_end
-            }
-        }), 200
+                token = generate_token(admin.id, "admin")
+                return jsonify({
+                    "token": token,
+                    "user": {
+                        "id": admin.id,
+                        "email": admin.email,
+                        "role": "admin"
+                    }
+                }), 200
 
+            # ================= CLIENT LOGIN =================
+            user = User.query.filter_by(email=email, role="client").first()
+            if not user:
+                return jsonify({"message": "Invalid credentials"}), 401
 
-        # ================= ADMIN LOGIN =================
-        if role == "admin":
-            if email != os.getenv("ADMIN_EMAIL") or password != os.getenv("ADMIN_PASSWORD"):
-                return jsonify({"message": "Invalid admin credentials"}), 401
+            if not check_password_hash(user.password_hash, password):
+                return jsonify({"message": "Invalid credentials"}), 401
 
-            admin = User.query.filter_by(email=email, role="admin").first()
-            if not admin:
-                return jsonify({"message": "Admin account not found"}), 500
+            if not user.approved:
+                return jsonify({"message": "Account pending admin approval"}), 403
 
-            token = generate_token(admin.id, "admin")
+            token = generate_token(user.id, "client")
+
             return jsonify({
                 "token": token,
                 "user": {
-                    "id": admin.id,
-                    "email": admin.email,
-                    "role": "admin"
+                    "id": user.id,
+                    "name": user.name,
+                    "email": user.email,
+                    "role": "client",
+                    "approved": user.approved,
+                    "plan": user.plan,
+                    "subscription_end": (
+                        user.subscription_end.isoformat()
+                        if user.subscription_end else None
+                    )
                 }
             }), 200
 
-        # ================= CLIENT LOGIN =================
-        user = User.query.filter_by(email=email).first()
-        if not user:
-            return jsonify({"message": "User not found"}), 404
-
-        if not check_password_hash(user.password_hash, password):
-            return jsonify({"message": "Incorrect password"}), 401
-
-        if not user.approved:
-            return jsonify({"message": "Account pending admin approval"}), 403
-
-        token = generate_token(user.id, "user")
-
-        return jsonify({
-            "token": token,
-            "user": {
-                "id": user.id,
-                "email": user.email,
-                "plan": user.plan,
-                "subscription_end": user.subscription_end.isoformat() if user.subscription_end else None,
-                "role": "client"
-            }
-        }), 200
-
+        except Exception as e:
+            print("LOGIN ERROR:", e)  # 👈 shows in Render logs
+            return jsonify({"message": "Server error"}), 500
 
     # ---------------- CURRENT USER ----------------
     @app.get("/api/me")
@@ -459,3 +453,4 @@ def ensure_admin_user(app):
 
 # ---------------- RUN ----------------
 app = create_app()
+
