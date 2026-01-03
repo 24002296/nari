@@ -64,30 +64,27 @@
         </form>
     </div>
 
-<script>
+<script type="module">
 const loginForm = document.getElementById("loginForm");
-const API = import.meta.env.VITE_API_URL;
-
-fetch(`${API}/api/login`);
+const API_URL = "https://nari-15.onrender.com";
 
 loginForm.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    const role = document.querySelector('input[name="role"]:checked').value;
+    const role = document.querySelector('input[name="role"]:checked')?.value;
     const email = document.querySelector(".text").value.trim();
     const password = document.querySelector(".pass").value.trim();
 
-    try {
-        fetch("https://nari-15.onrender.com/api/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            email,
-            password,
-            role
-        })
-        
+    if (!role || !email || !password) {
+        alert("Please fill in all fields");
+        return;
+    }
 
+    try {
+        const res = await fetch(`${API_URL}/api/login`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password, role })
         });
 
         const data = await res.json();
@@ -97,40 +94,41 @@ loginForm.addEventListener("submit", async (e) => {
             return;
         }
 
-       // SAVE TOKEN
+        // SAVE TOKEN
         localStorage.setItem("token", data.token);
 
-        // ROLE CHECK
+        // ADMIN
         if (data.user.role === "admin") {
             window.location.href = "admin.html";
             return;
         }
 
-        // 🔒 NOT APPROVED
+        // NOT APPROVED
         if (!data.user.approved) {
             alert("Account pending approval");
             localStorage.removeItem("token");
             return;
         }
 
-        // ✅ APPROVED BUT NO PLAN
+        // NO PLAN
         if (!data.user.plan || !data.user.subscription_end) {
             window.location.href = "userPlan.html";
             return;
         }
 
-        // ✅ ACTIVE SUBSCRIPTION
+        // EXPIRED PLAN
         const endDate = new Date(data.user.subscription_end);
         if (endDate < new Date()) {
             window.location.href = "userPlan.html";
             return;
         }
 
+        // SUCCESS
         window.location.href = "page2.html";
 
     } catch (err) {
-        alert("Server error. Please try again.");
         console.error(err);
+        alert("Server error. Please try again.");
     }
 });
 </script>
@@ -138,5 +136,6 @@ loginForm.addEventListener("submit", async (e) => {
 
 
 </body>
+
 
 </html>
