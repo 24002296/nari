@@ -45,11 +45,20 @@ def create_app():
     app.config["MAIL_DEFAULT_SENDER"] = os.getenv("MAIL_FROM")
 
     # ---------------- INIT ----------------
-    CORS(app, resources={r"/api/*": {"origins": "*"}})
+    
     db.init_app(app)
     mail.init_app(app)
     logging.basicConfig(level=logging.INFO)
-    
+  
+
+    CORS(app, resources={
+        r"/api/*": {
+            "origins": [
+                "https://narii.netlify.app"
+            ]
+        }
+    })
+
     # ---------------- HEALTH ----------------
     @app.get("/api/ping")
     def ping():
@@ -84,51 +93,38 @@ def create_app():
 
     @app.post("/api/login")
     def login():
-        data = request.get_json()
+        try:
+            data = request.get_json()
+            print("LOGIN DATA:", data)
 
-        if not data:
-            return jsonify({"message": "Missing JSON body"}), 400
+            email = data.get("email")
+            password = data.get("password")
+            role = data.get("role")
 
-        email = data.get("email")
-        password = data.get("password")
-        role = data.get("role")
+            user = User.query.filter_by(email=email, role=role).first()
+            print("USER FOUND:", user)
 
-        if not email or not password or not role:
-            return jsonify({"message": "Missing credentials"}), 400
-
-        user = User.query.filter_by(email=email, role=role).first()
-
-        if not user:
-            return jsonify({"message": "Invalid credentials"}), 401
-
-        if not check_password_hash(user.password_hash, password):
-            return jsonify({"message": "Invalid credentials"}), 401
-
-        # Admin check
-        if role == "admin":
             if not user:
-                return jsonify({"message": "Admin not found"}), 401
+                return jsonify({"message": "Invalid credentials"}), 401
 
-        # User approval check
-        if role != "admin" and not user.approved:
-            return jsonify({"message": "Account pending approval"}), 403
+            if not check_password_hash(user.password_hash, password):
+                return jsonify({"message": "Invalid credentials"}), 401
 
-        token = generate_token(user.id, user.role)
+            token = generate_token(user.id, user.role)
+            print("TOKEN GENERATED")
 
-        return jsonify({
-            "token": token,
-            "user": {
-                "id": user.id,
-                "name": user.name,
-                "email": user.email,
-                "role": user.role,
-                "approved": user.approved,
-                "plan": user.plan,
-                "subscription_end": user.subscription_end.isoformat()
-                if user.subscription_end else None
-            }
-        }), 200
+            return jsonify({
+                "token": token,
+                "user": {
+                    "id": user.id,
+                    "email": user.email,
+                    "role": user.role
+                }
+            }), 200
 
+        except Exception as e:
+            print("LOGIN ERROR:", str(e))
+            return jsonify({"error": str(e)}), 500
 
     # ---------------- CURRENT USER ----------------
     @app.get("/api/me")
@@ -431,6 +427,10 @@ def ensure_admin_user(app):
 
 
 # ---------------- RUN ----------------
+
 app = create_app()
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000, debug=True)
 
 
