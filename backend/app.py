@@ -402,13 +402,7 @@ def create_app():
             db.session.commit()
 
             return jsonify({"message": "User deactivated"})
-    app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
-    "DATABASE_URL",
-    "sqlite:///local.db"  # fallback for local dev
-)
 
-    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False   
-     
     return app
 
 
@@ -449,4 +443,5 @@ app = create_app()
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
+
 
