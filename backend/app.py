@@ -416,7 +416,6 @@ def ensure_admin_user(app):
             return
 
         admin = User.query.filter_by(email=admin_email).first()
-
         password_hash = generate_password_hash(admin_password)
 
         if admin:
@@ -426,6 +425,8 @@ def ensure_admin_user(app):
             print("✅ Admin password RESET")
         else:
             admin = User(
+                name="System",
+                surname="Administrator",
                 email=admin_email,
                 password_hash=password_hash,
                 role="admin",
@@ -436,13 +437,11 @@ def ensure_admin_user(app):
 
         db.session.commit()
 
-
-
-
 # ---------------- RUN ----------------
 
 app = create_app()
 ensure_admin_user(app)
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
+
 
