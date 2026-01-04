@@ -40,6 +40,10 @@ def create_app():
     # ---------------- INIT ----------------
     
     db.init_app(app)
+
+    with app.app_context():
+        db.create_all()
+
     mail.init_app(app)
     logging.basicConfig(level=logging.INFO)
   
