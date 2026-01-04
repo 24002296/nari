@@ -1,152 +1,187 @@
-/* RESET */
+/* =========================
+   GLOBAL RESET
+========================= */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    font-family: "Segoe UI", Arial, sans-serif;
 }
 
-/* PAGE BACKGROUND */
+/* =========================
+   BODY & BACKGROUND
+========================= */
 body {
     min-height: 100vh;
-    background: linear-gradient(135deg, #0f172a, #020617);
-    color: #fff;
+    background: linear-gradient(135deg, #0b0f1a, #111827);
+    color: #ffffff;
+}
+
+/* =========================
+   OVERLAY
+========================= */
+.overlay {
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
-}
-
-/* OVERLAY CONTAINER */
-.overlay {
-    flex: 1;
+    align-items: center;
+    justify-content: center;
     padding: 40px 20px;
-    text-align: center;
 }
 
-/* BRAND */
-.overlay h3 {
-    font-size: 26px;
+/* =========================
+   BRAND
+========================= */
+.brand {
+    font-size: 2.2rem;
     letter-spacing: 2px;
     margin-bottom: 30px;
     color: #38bdf8;
 }
 
-/* PLANS CONTAINER */
-.main {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 25px;
-    max-width: 1000px;
-    margin: auto;
-}
-
-/* PLAN CARD */
-.plan {
-    background: #020617;
-    border-radius: 14px;
-    padding: 30px 20px;
-    box-shadow: 0 15px 40px rgba(0,0,0,0.6);
-    border: 1px solid #1e293b;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.plan:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 25px 60px rgba(0,0,0,0.8);
-}
-
-/* PLAN TITLE */
-.plan h2 {
-    font-size: 22px;
-    margin-bottom: 20px;
-}
-
-/* BUTTON */
-.plan button {
+/* =========================
+   SUBSCRIPTION CARD
+========================= */
+.subscription-box {
+    background: rgba(17, 24, 39, 0.95);
+    border-radius: 16px;
+    padding: 35px 30px;
+    max-width: 420px;
     width: 100%;
-    padding: 14px;
-    font-size: 16px;
-    border-radius: 10px;
-    border: none;
-    cursor: pointer;
-    font-weight: bold;
-    transition: 0.3s ease;
-}
-
-/* PLAN COLORS */
-.plan.basic {
-    border-top: 4px solid #38bdf8;
-}
-
-.plan.basic button {
-    background: #38bdf8;
-    color: #020617;
-}
-
-.plan.standard {
-    border-top: 4px solid #22c55e;
-}
-
-.plan.standard button {
-    background: #22c55e;
-    color: #020617;
-}
-
-.plan.premium {
-    border-top: 4px solid #facc15;
-}
-
-.plan.premium button {
-    background: #facc15;
-    color: #020617;
-}
-
-/* BUTTON HOVER */
-.plan button:hover {
-    opacity: 0.85;
-    transform: scale(1.03);
-}
-
-/* FOOTER */
-.footer {
-    background: #020617;
-    padding: 30px 15px;
     text-align: center;
-    border-top: 1px solid #1e293b;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+    animation: fadeIn 0.6s ease-in-out;
 }
 
-.footer h2 {
-    color: #38bdf8;
-    margin-bottom: 10px;
-}
-
-.footer-text {
-    margin-bottom: 10px;
-    font-size: 14px;
-    color: #94a3b8;
-}
-
-.admin-info {
-    font-size: 13px;
-    color: #cbd5f5;
+.subscription-box h2 {
+    font-size: 1.6rem;
     margin-bottom: 15px;
 }
 
+/* =========================
+   PRICE
+========================= */
+.price {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #22c55e;
+}
+
+.price span {
+    font-size: 1rem;
+    font-weight: normal;
+    color: #9ca3af;
+}
+
+/* =========================
+   FEATURES LIST
+========================= */
+.features {
+    list-style: none;
+    text-align: left;
+    margin: 20px 0 30px;
+}
+
+.features li {
+    margin-bottom: 12px;
+    padding-left: 24px;
+    position: relative;
+    font-size: 0.95rem;
+    color: #e5e7eb;
+}
+
+.features li::before {
+    content: "✔";
+    position: absolute;
+    left: 0;
+    color: #22c55e;
+    font-weight: bold;
+}
+
+/* =========================
+   SUBSCRIBE BUTTON
+========================= */
+.subscribe-btn {
+    width: 100%;
+    padding: 14px;
+    font-size: 1.05rem;
+    font-weight: bold;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    background: linear-gradient(135deg, #38bdf8, #0ea5e9);
+    color: #000;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.subscribe-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(56, 189, 248, 0.4);
+}
+
+.subscribe-btn:active {
+    transform: translateY(0);
+}
+
+/* =========================
+   FOOTER
+========================= */
+.footer {
+    background: #020617;
+    padding: 25px 20px;
+    text-align: center;
+}
+
+.footer-content h2 {
+    color: #38bdf8;
+    margin-bottom: 8px;
+}
+
+.footer-text {
+    font-size: 0.9rem;
+    color: #9ca3af;
+    margin-bottom: 10px;
+}
+
+.admin-info {
+    font-size: 0.85rem;
+    color: #cbd5f5;
+    margin-bottom: 10px;
+}
+
 .footer-bottom {
-    font-size: 12px;
+    font-size: 0.8rem;
     color: #64748b;
 }
 
-/* MOBILE */
-@media (max-width: 600px) {
-    .overlay h3 {
-        font-size: 22px;
+/* =========================
+   ANIMATION
+========================= */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* =========================
+   MOBILE RESPONSIVE
+========================= */
+@media (max-width: 480px) {
+    .brand {
+        font-size: 1.8rem;
     }
 
-    .plan h2 {
-        font-size: 20px;
+    .subscription-box {
+        padding: 28px 22px;
     }
 
-    .plan button {
-        font-size: 15px;
+    .price {
+        font-size: 2.1rem;
     }
 }
