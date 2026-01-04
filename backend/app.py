@@ -90,19 +90,16 @@ def create_app():
 
     @app.post("/api/login")
     def login():
-        data = request.get_json()
-
-        if not data:
-            return jsonify({"message": "No data provided"}), 400
+        data = request.get_json() or {}
 
         email = data.get("email")
         password = data.get("password")
         role = data.get("role")
 
-        if not email or not password or not role:
-            return jsonify({"message": "Missing fields"}), 400
+        if not email or not password:
+            return jsonify({"message": "Missing credentials"}), 400
 
-        user = User.query.filter_by(email=email, role=role).first()
+        user = User.query.filter_by(email=email).first()
 
         if not user:
             return jsonify({"message": "Invalid credentials"}), 401
@@ -110,8 +107,11 @@ def create_app():
         if not check_password_hash(user.password_hash, password):
             return jsonify({"message": "Invalid credentials"}), 401
 
-        # ADMIN LOGIN
+        # 🔐 ADMIN LOGIN
         if role == "admin":
+            if user.role != "admin":
+                return jsonify({"message": "Not an admin account"}), 403
+
             token = generate_token(user.id, "admin")
             return jsonify({
                 "token": token,
@@ -122,7 +122,7 @@ def create_app():
                 }
             }), 200
 
-        # CLIENT LOGIN
+        # 👤 CLIENT LOGIN
         if not user.approved:
             return jsonify({"message": "Account pending approval"}), 403
 
@@ -138,6 +138,7 @@ def create_app():
                 "subscription_end": user.subscription_end.isoformat() if user.subscription_end else None
             }
         }), 200
+
 
 
     # ---------------- CURRENT USER ----------------
@@ -440,3 +441,4 @@ app = create_app()
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
+
