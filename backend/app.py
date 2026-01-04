@@ -25,15 +25,8 @@ def create_app():
     app.config["JWT_EXP_SECONDS"] = int(os.getenv("JWT_EXP_SECONDS", "86400"))
 
     # ---------------- DATABASE ----------------
-    DB_USER = os.getenv("MYSQL_USER")
-    DB_PASS = quote_plus(os.getenv("MYSQL_PASSWORD", ""))
-    DB_HOST = os.getenv("MYSQL_HOST", "127.0.0.1")
-    DB_PORT = os.getenv("MYSQL_PORT", "3306")
-    DB_NAME = os.getenv("MYSQL_DB")
-
-    app.config["SQLALCHEMY_DATABASE_URI"] = (
-        f"mysql+pymysql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
-    )
+# ---------------- DATABASE ----------------
+    app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL")
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
     # ---------------- MAIL ----------------
@@ -443,5 +436,3 @@ app = create_app()
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
-
-
