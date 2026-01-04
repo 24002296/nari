@@ -54,7 +54,7 @@ async function loadPage() {
         return;
     }
 
-    const res = await fetch("http://127.0.0.1:5000/api/me", {
+    const res = await fetch("https://nari-15.onrender.com/api/me", {
         headers: {
             Authorization: "Bearer " + token
         }
@@ -116,4 +116,5 @@ loadPage();
 </script>
 
 </body>
+
 </html>
