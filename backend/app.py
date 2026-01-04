@@ -400,45 +400,49 @@ def create_app():
             db.session.commit()
 
             return jsonify({"message": "User deactivated"})
+    
 
     return app
 
 
 # ---------------- ADMIN BOOTSTRAP ----------------
 def ensure_admin_user(app):
-    email = os.getenv("ADMIN_EMAIL")
-    password = os.getenv("ADMIN_PASSWORD")
-
-    if not email or not password:
-        return
-
     with app.app_context():
-        admin = User.query.filter_by(email=email).first()
-        hashed = generate_password_hash(password)
+        admin_email = os.getenv("ADMIN_EMAIL")
+        admin_password = os.getenv("ADMIN_PASSWORD")
+
+        if not admin_email or not admin_password:
+            print("⚠️ ADMIN credentials not set")
+            return
+
+        admin = User.query.filter_by(email=admin_email).first()
+
+        password_hash = generate_password_hash(admin_password)
 
         if admin:
+            admin.password_hash = password_hash
             admin.role = "admin"
             admin.approved = True
-            admin.password_hash = hashed
+            print("✅ Admin password RESET")
         else:
             admin = User(
-                name="Admin",
-                surname="",
-                email=email,
-                password_hash=hashed,
-                approved=True,
-                role="admin"
+                email=admin_email,
+                password_hash=password_hash,
+                role="admin",
+                approved=True
             )
             db.session.add(admin)
+            print("✅ Admin CREATED")
 
         db.session.commit()
+
 
 
 
 # ---------------- RUN ----------------
 
 app = create_app()
-
+ensure_admin_user(app)
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
 
