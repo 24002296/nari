@@ -14,12 +14,10 @@ class User(db.Model):
     password_hash = db.Column(db.String(200), nullable=False)
     approved = db.Column(db.Boolean, default=False)
     role = db.Column(db.String(20), default="client")
-    
-    plan = db.Column(db.String(50))
+
     subscription_start = db.Column(db.DateTime)
     subscription_end = db.Column(db.DateTime)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-
 
 class Signal(db.Model):
     __tablename__ = "signals"
@@ -29,7 +27,6 @@ class Signal(db.Model):
     entry = db.Column(db.String(120), nullable=False)
     tp = db.Column(db.String(120), nullable=False)
     sl = db.Column(db.String(120), nullable=False)
-    plan = db.Column(db.String(50), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     lots = db.relationship(
