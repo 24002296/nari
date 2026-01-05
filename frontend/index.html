@@ -64,6 +64,7 @@
         </form>
     </div>
 <script type="module">
+localStorage.removeItem("token");
 const loginForm = document.getElementById("loginForm");
 const API_URL = "https://nari-15.onrender.com";
 
@@ -131,5 +132,6 @@ loginForm.addEventListener("submit", async (e) => {
 
 
 </html>
+
 
 
