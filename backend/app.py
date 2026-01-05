@@ -137,10 +137,12 @@ def create_app():
                 "id": user.id,
                 "email": user.email,
                 "role": "client",
+                "approved": user.approved,   # ✅ ADD THIS
                 "plan": user.plan,
                 "subscription_end": user.subscription_end.isoformat() if user.subscription_end else None
             }
         }), 200
+
 
 
 
@@ -235,7 +237,7 @@ def create_app():
             "id": u.id,
             "name": u.name,
             "email": u.email,
-            "approved": u.approved,
+            
             "plan": u.plan,
             "expiry": u.subscription_end.isoformat() if u.subscription_end else None
         } for u in users]), 200
@@ -454,5 +456,4 @@ app = create_app()
 ensure_admin_user(app)
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
-
 
