@@ -41,8 +41,7 @@
                 <tr>
                     <th>Name</th>
                     <th>Email</th>
-                    <th>Plan</th>
-                    <th>Expiry</th>
+                    <th>Subscription Expiry</th>
                     <th>Action</th>
                 </tr>
             </thead>
@@ -59,22 +58,14 @@
         <h2>Add / Edit Signal</h2>
 
         <form id="signalForm">
-            <input id="pair" placeholder="Pair" required />
+            <input id="pair" placeholder="Pair (e.g. EURUSD)" required />
             <input id="entry" type="number" step="0.00001" placeholder="Entry" required />
             <input id="tp" type="number" step="0.00001" placeholder="Take Profit" required />
             <input id="sl" type="number" step="0.00001" placeholder="Stop Loss" required />
 
-            <select id="plan" required>
-                <option value="">Select Plan</option>
-                <option value="Basic">Basic</option>
-                <option value="Standard">Standard</option>
-                <option value="Premium">Premium</option>
-            </select>
-
             <h4>Lot Sizes (optional – max 3)</h4>
             <div id="lotRows"></div>
             <button type="button" onclick="addLot()">+ Add Lot</button>
-
 
             <br><br>
             <button type="submit">Save Signal</button>
@@ -91,7 +82,6 @@
                     <th>Entry</th>
                     <th>TP</th>
                     <th>SL</th>
-                    <th>Plan</th>
                     <th>Action</th>
                 </tr>
             </thead>
@@ -126,18 +116,11 @@ function authHeaders() {
 ================================ */
 async function loadPendingUsers() {
     const tbody = document.getElementById("pendingUsersBody");
-    if (!tbody) return;
-
     tbody.innerHTML = "<tr><td colspan='4'>Loading...</td></tr>";
 
     const res = await fetch(`${API_BASE}/admin/users/pending`, {
         headers: authHeaders()
     });
-
-    if (!res.ok) {
-        tbody.innerHTML = "<tr><td colspan='4'>Failed</td></tr>";
-        return;
-    }
 
     const users = await res.json();
     tbody.innerHTML = "";
@@ -161,9 +144,7 @@ async function loadPendingUsers() {
 
 async function loadActiveUsers() {
     const tbody = document.getElementById("activeUsersBody");
-    if (!tbody) return;
-
-    tbody.innerHTML = "<tr><td colspan='5'>Loading...</td></tr>";
+    tbody.innerHTML = "<tr><td colspan='4'>Loading...</td></tr>";
 
     const res = await fetch(`${API_BASE}/admin/users/active`, {
         headers: authHeaders()
@@ -173,7 +154,7 @@ async function loadActiveUsers() {
     tbody.innerHTML = "";
 
     if (users.length === 0) {
-        tbody.innerHTML = "<tr><td colspan='5'>No active users</td></tr>";
+        tbody.innerHTML = "<tr><td colspan='4'>No active users</td></tr>";
         return;
     }
 
@@ -182,8 +163,7 @@ async function loadActiveUsers() {
             <tr>
                 <td>${u.name}</td>
                 <td>${u.email}</td>
-                <td>${u.plan || "-"}</td>
-                <td>${u.expiry || "-"}</td>
+                <td>${u.subscription_end || "-"}</td>
                 <td><button onclick="deactivateUser(${u.id})">Deactivate</button></td>
             </tr>
         `;
@@ -214,24 +194,17 @@ let editingSignalId = null;
 
 async function loadSignals() {
     const tbody = document.getElementById("signalTableBody");
-    if (!tbody) return;
-
-    tbody.innerHTML = "<tr><td colspan='6'>Loading...</td></tr>";
+    tbody.innerHTML = "<tr><td colspan='5'>Loading...</td></tr>";
 
     const res = await fetch(`${API_BASE}/admin/signals`, {
         headers: authHeaders()
     });
 
-    if (!res.ok) {
-        tbody.innerHTML = "<tr><td colspan='6'>Failed to load signals</td></tr>";
-        return;
-    }
-
     const signals = await res.json();
     tbody.innerHTML = "";
 
     if (signals.length === 0) {
-        tbody.innerHTML = "<tr><td colspan='6'>No signals</td></tr>";
+        tbody.innerHTML = "<tr><td colspan='5'>No signals</td></tr>";
         return;
     }
 
@@ -242,9 +215,8 @@ async function loadSignals() {
                 <td>${s.entry}</td>
                 <td>${s.tp}</td>
                 <td>${s.sl}</td>
-                <td>${s.plan}</td>
                 <td>
-                    <button onclick="editSignal(${s.id}, '${s.pair}', '${s.entry}', '${s.tp}', '${s.sl}', '${s.plan}')">Edit</button>
+                    <button onclick="editSignal(${s.id}, '${s.pair}', '${s.entry}', '${s.tp}', '${s.sl}')">Edit</button>
                     <button onclick="deleteSignal(${s.id})">Delete</button>
                 </td>
             </tr>
@@ -263,13 +235,12 @@ async function deleteSignal(id) {
     loadSignals();
 }
 
-function editSignal(id, pair, entry, tp, sl, plan) {
+function editSignal(id, pair, entry, tp, sl) {
     editingSignalId = id;
-    document.getElementById("pair").value = pair;
-    document.getElementById("entry").value = entry;
-    document.getElementById("tp").value = tp;
-    document.getElementById("sl").value = sl;
-    document.getElementById("plan").value = plan;
+    pair.value = pair;
+    entry.value = entry;
+    tp.value = tp;
+    sl.value = sl;
 }
 
 /* ===============================
@@ -285,49 +256,33 @@ function addLot() {
     const row = document.createElement("div");
     row.className = "lot-row";
     row.innerHTML = `
-        <input class="lot-size" type="number" step="0.01" placeholder="Lot size" required>
-        <input class="win-amount" type="number" step="0.01" placeholder="Win (R)" required>
-        <input class="loss-amount" type="number" step="0.01" placeholder="Loss (R)" required>
+        <input class="lot-size" type="number" step="0.01" placeholder="Lot size">
+        <input class="win-amount" type="number" step="0.01" placeholder="Win (R)">
+        <input class="loss-amount" type="number" step="0.01" placeholder="Loss (R)">
         <button type="button" onclick="this.parentElement.remove()">✕</button>
     `;
     container.appendChild(row);
 }
 
 function collectLots() {
-    const rows = document.querySelectorAll(".lot-row");
-    const lots = [];
-
-    rows.forEach(row => {
-        const lot = row.querySelector(".lot-size").value;
-        const win = row.querySelector(".win-amount").value;
-        const loss = row.querySelector(".loss-amount").value;
-
-        if (lot && win && loss) {
-            lots.push({
-                lot_size: lot,
-                win_amount: win,
-                loss_amount: loss
-            });
-        }
-    });
-
-    return lots;
+    return [...document.querySelectorAll(".lot-row")].map(row => ({
+        lot_size: row.querySelector(".lot-size").value,
+        win_amount: row.querySelector(".win-amount").value,
+        loss_amount: row.querySelector(".loss-amount").value
+    }));
 }
 
 /* ===============================
-   FORM SUBMIT
+   INIT
 ================================ */
 document.addEventListener("DOMContentLoaded", () => {
 
-    const logoutBtn = document.getElementById("logoutBtn");
-    logoutBtn.addEventListener("click", () => {
+    document.getElementById("logoutBtn").onclick = () => {
         localStorage.clear();
         window.location.href = "index.html";
-    });
+    };
 
-    const form = document.getElementById("signalForm");
-
-    form.onsubmit = async e => {
+    document.getElementById("signalForm").onsubmit = async e => {
         e.preventDefault();
 
         const payload = {
@@ -335,7 +290,6 @@ document.addEventListener("DOMContentLoaded", () => {
             entry: entry.value,
             tp: tp.value,
             sl: sl.value,
-            plan: plan.value,
             lots: collectLots()
         };
 
@@ -352,7 +306,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
         editingSignalId = null;
-        form.reset();
+        e.target.reset();
         document.getElementById("lotRows").innerHTML = "";
         loadSignals();
     };
@@ -361,10 +315,9 @@ document.addEventListener("DOMContentLoaded", () => {
     loadActiveUsers();
     loadSignals();
 });
-
 </script>
-
 
 </body>
 </html>
+
 
