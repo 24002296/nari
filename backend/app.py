@@ -138,7 +138,7 @@ def create_app():
                 "email": user.email,
                 "role": "client",
                 "approved": user.approved,   # ✅ ADD THIS
-                "plan": user.plan,
+               
                 "subscription_end": user.subscription_end.isoformat() if user.subscription_end else None
             }
         }), 200
@@ -364,7 +364,8 @@ def create_app():
     def client_signals():
         user = request.current_user
 
-        signals = Signal.query.filter_by(plan=user.plan).order_by(Signal.created_at.desc()).all()
+        signals = Signal.query.order_by(Signal.created_at.desc()).all()
+
 
         return jsonify([
             {
