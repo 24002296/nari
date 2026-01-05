@@ -123,7 +123,10 @@ def create_app():
             }), 200
 
         # 👤 CLIENT LOGIN
-        if not user.approved:
+        if user.role != "client":
+            return jsonify({"message": "Invalid account type"}), 403
+
+        if user.approved is not True:
             return jsonify({"message": "Account pending approval"}), 403
 
         token = generate_token(user.id, "client")
@@ -240,9 +243,16 @@ def create_app():
     @admin_required
     def approve_user(user_id):
         user = User.query.get_or_404(user_id)
+
         user.approved = True
+        db.session.add(user)
         db.session.commit()
-        return jsonify({"message": "Approved"}), 200
+        db.session.refresh(user)
+
+        return jsonify({
+            "message": "Approved",
+            "approved": user.approved
+        }), 200
 
     @app.delete("/api/admin/users/<int:user_id>/reject")
     @admin_required
@@ -443,5 +453,4 @@ app = create_app()
 ensure_admin_user(app)
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
-
 
