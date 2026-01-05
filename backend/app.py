@@ -235,6 +235,7 @@ def create_app():
             "id": u.id,
             "name": u.name,
             "email": u.email,
+            "approved": u.approved,
             "plan": u.plan,
             "expiry": u.subscription_end.isoformat() if u.subscription_end else None
         } for u in users]), 200
@@ -453,4 +454,5 @@ app = create_app()
 ensure_admin_user(app)
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
+
 
