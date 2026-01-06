@@ -37,62 +37,45 @@
 </div>
 
 <script>
-const userEmail = localStorage.getItem("loggedInUser");
-if(!userEmail){
-    alert("Please login first.");
+const token = localStorage.getItem("token");
+
+if (!token) {
+    alert("Please log in first");
     window.location.href = "index.html";
 }
 
-let users = JSON.parse(localStorage.getItem("users")) || [];
-let currentUser = users.find(u => u.email === userEmail);
+// SINGLE PLAN — NO SELECTION REQUIRED
+const plan = "monthly";
+const amount = 5000;
 
-const selectedPlan = localStorage.getItem("selectedPlan");
-if(!selectedPlan){
-    alert("Select a plan first.");
-    window.location.href = "userPlan.html";
-}
+// Example payment submit
+async function payNow() {
+    const res = await fetch("https://nari-15.onrender.com/api/subscribe", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + token
+        },
+        body: JSON.stringify({
+            plan,
+            amount
+        })
+    });
 
+    const data = await res.json();
 
-document.getElementById("cardNumber").addEventListener("input", function() {
-    const value = this.value.replace(/\D/g, "");
-    const icon = document.getElementById("cardIcon");
-
-    if (value.startsWith("4")) {
-        icon.innerHTML = "💳 VISA";
-        icon.style.color = "#00eaff";
-    } else if (/^5[1-5]/.test(value)) {
-        icon.innerHTML = "💳 MASTERCARD";
-        icon.style.color = "#ffb700";
-    } else {
-        icon.innerHTML = "";
+    if (!res.ok) {
+        alert(data.message || "Payment failed");
+        return;
     }
 
-    
-    this.value = value.replace(/(.{4})/g, "$1 ").trim();
-});
-
-
-document.getElementById("paymentForm").addEventListener("submit", function(e){
-    e.preventDefault();
-
-    const startDate = new Date();
-    const endDate = new Date();
-    endDate.setDate(startDate.getDate() + 30);
-
-    currentUser.subscription = {
-        plan: selectedPlan,
-        startDate: startDate.toISOString(),
-        endDate: endDate.toISOString()
-    };
-
-    localStorage.setItem("users", JSON.stringify(users));
-
-    alert(`Subscription for ${selectedPlan} activated successfully!`);
-    window.location.href = "signal.html";
-});
-
+    alert("Subscription activated!");
+    window.location.href = "page2.html";
+}
 </script>
+
 
 </body>
 
 </html>
+
