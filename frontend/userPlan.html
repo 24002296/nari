@@ -9,42 +9,6 @@
 
 <body>
 
-<script>
-const token = localStorage.getItem("token");
-if (!token) {
-    window.location.href = "index.html";
-}
-
-// CHECK IF USER ALREADY HAS ACTIVE SUBSCRIPTION
-async function checkUser() {
-    const res = await fetch("https://nari-15.onrender.com/api/me", {
-        headers: { Authorization: "Bearer " + token }
-    });
-
-    if (!res.ok) {
-        localStorage.removeItem("token");
-        window.location.href = "index.html";
-        return;
-    }
-
-    const user = await res.json();
-
-    if (user.plan && user.subscription_end) {
-        const endDate = new Date(user.subscription_end);
-        if (endDate > new Date()) {
-            window.location.href = "page2.html";
-        }
-    }
-}
-
-checkUser();
-
-// REDIRECT TO PAYMENT PAGE
-function goToPayment() {
-    window.location.href = "payment.html";
-}
-</script>
-
 <div class="overlay">
     <h1 class="brand">NARI MARKETS</h1>
 
@@ -58,7 +22,6 @@ function goToPayment() {
             <li>✔ Signals Updated Every Hour</li>
             <li>✔ Users must check regularly for new signals</li>
             <li>✔ Verified Market Analysis</li>
-            <li>✔ Admin-Approved Access Only</li>
         </ul>
 
         <button class="subscribe-btn" onclick="goToPayment()">
@@ -70,22 +33,18 @@ function goToPayment() {
 <footer class="footer">
     <div class="footer-content">
         <h2>NARI MARKETS</h2>
-
-        <p class="footer-text">
-            Professional Forex Signals & Market Insights
-        </p>
-
-        <p class="admin-info">
-            <strong>Admin:</strong> NARI MARKETS Admin<br>
-            <strong>Email:</strong> admin@narimarkets.com
-        </p>
-
+        <p class="footer-text">Professional Forex Signals & Market Insights</p>
         <div class="footer-bottom">
             © 2026 NARI MARKETS — All Rights Reserved
         </div>
     </div>
 </footer>
 
+<script>
+function goToPayment() {
+    window.location.href = "payment.html";
+}
+</script>
+
 </body>
 </html>
-
