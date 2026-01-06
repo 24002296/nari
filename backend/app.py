@@ -154,7 +154,6 @@ def create_app():
         return jsonify({
             "id": user.id,
             "email": user.email,
-            "plan": user.plan,
             "subscription_end": user.subscription_end.isoformat() if user.subscription_end else None
         })
 
@@ -163,17 +162,17 @@ def create_app():
     @login_required
     def subscribe():
         user = request.current_user
-        plan = request.json.get("plan")
 
-        if not plan:
-            return jsonify({"message": "Plan required"}), 400
-
-        user.plan = plan
         user.subscription_start = datetime.utcnow()
         user.subscription_end = datetime.utcnow() + timedelta(days=30)
 
         db.session.commit()
-        return jsonify({"message": "Subscribed"}), 200
+
+        return jsonify({
+            "message": "Subscription activated",
+            "subscription_end": user.subscription_end.isoformat()
+        }), 200
+
 
     # ---------------- USER SIGNALS ----------------
 
@@ -237,10 +236,12 @@ def create_app():
             "id": u.id,
             "name": u.name,
             "email": u.email,
-            
-            "plan": u.plan,
+            "subscription_active": bool(
+                u.subscription_end and u.subscription_end > datetime.utcnow()
+            ),
             "expiry": u.subscription_end.isoformat() if u.subscription_end else None
         } for u in users]), 200
+
 
     @app.put("/api/admin/users/<int:user_id>/approve")
     @admin_required
@@ -409,7 +410,7 @@ def create_app():
 
             user.is_active = False
             user.subscription_end = None
-            user.plan = None
+           
 
             db.session.commit()
 
@@ -457,4 +458,5 @@ app = create_app()
 ensure_admin_user(app)
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
+
 
