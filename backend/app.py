@@ -167,7 +167,14 @@ def create_app():
     @login_required
     def subscribe():
         user = request.current_user
+        data = request.get_json() or {}
 
+        plan = data.get("plan")
+
+        if plan not in ALLOWED_PLANS:
+            return jsonify({"message": "Invalid plan"}), 400
+
+        user.plan = plan
         user.subscription_start = datetime.utcnow()
         user.subscription_end = datetime.utcnow() + timedelta(days=30)
 
@@ -175,9 +182,9 @@ def create_app():
 
         return jsonify({
             "message": "Subscription activated",
+            "plan": user.plan,
             "subscription_end": user.subscription_end.isoformat()
         }), 200
-
 
     # ---------------- USER SIGNALS ----------------
 
