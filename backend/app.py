@@ -19,6 +19,7 @@ load_dotenv()
 
 def create_app():
     app = Flask(__name__)
+    ALLOWED_PLANS = {"monthly"}
 
     # ---------------- BASIC CONFIG ----------------
     app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "dev_secret")
@@ -322,8 +323,13 @@ def create_app():
     @admin_required
     def create_signal():
         data = request.get_json() or {}
+        plan = data.get("plan")
 
-        required = ["pair", "entry", "tp", "sl"]
+        if plan not in ALLOWED_PLANS:
+            return jsonify({"message": "Invalid plan"}), 400
+
+        required = ["pair", "entry", "tp", "sl", "plan"]
+
         if not all(k in data for k in required):
             return jsonify({"message": "Missing fields"}), 400
 
@@ -332,8 +338,9 @@ def create_app():
             entry=data["entry"],
             tp=data["tp"],
             sl=data["sl"],
-            plan="monthly"
+            plan=plan
         )
+
 
         db.session.add(signal)
         db.session.flush()  # IMPORTANT — get signal.id before commit
@@ -462,8 +469,3 @@ app = create_app()
 ensure_admin_user(app)
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
-
-
-
-
-
