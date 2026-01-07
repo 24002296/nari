@@ -67,20 +67,21 @@ async function loadPage() {
 
     const user = await res.json();
 
-    // ✅ Correct subscription check
-    if (!user.plan || !user.subscription_end) {
+    // ✅ Correct subscription check (single plan)
+    if (!user.subscription_end) {
         window.location.href = "userPlan.html";
         return;
     }
-
+    
     const endDate = new Date(user.subscription_end);
     if (endDate < new Date()) {
         window.location.href = "userPlan.html";
         return;
     }
+    
+    // ✅ Show fixed plan name
+    document.getElementById("userPlan").textContent = "Monthly Premium";
 
-    // ✅ Show plan
-    document.getElementById("userPlan").textContent = user.plan;
 
     // ✅ Countdown
     startCountdown(endDate);
@@ -118,3 +119,4 @@ loadPage();
 </body>
 
 </html>
+
