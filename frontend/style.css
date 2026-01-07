@@ -26,6 +26,15 @@ body {
     z-index: -1;
 }
 
+.motto {
+    margin-top: 6px;
+    font-size: 0.95rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.75);
+    font-weight: 500;
+    font-style: italic;
+}
 
 .overlay {
     width: 100%;
@@ -168,3 +177,4 @@ h4 a.join {
         padding: 10px;
     }
 }
+
