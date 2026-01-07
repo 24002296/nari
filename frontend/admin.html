@@ -282,34 +282,41 @@ document.addEventListener("DOMContentLoaded", () => {
         window.location.href = "index.html";
     };
 
-    document.getElementById("signalForm").onsubmit = async e => {
-        e.preventDefault();
+document.getElementById("signalForm").onsubmit = async e => {
+    e.preventDefault();
 
-        const payload = {
-            pair: pair.value,
-            entry: entry.value,
-            tp: tp.value,
-            sl: sl.value,
-            lots: collectLots()
-        };
-
-        const url = editingSignalId
-            ? `${API_BASE}/admin/signals/${editingSignalId}`
-            : `${API_BASE}/admin/signals`;
-
-        const method = editingSignalId ? "PUT" : "POST";
-
-        await fetch(url, {
-            method,
-            headers: authHeaders(),
-            body: JSON.stringify(payload)
-        });
-
-        editingSignalId = null;
-        e.target.reset();
-        document.getElementById("lotRows").innerHTML = "";
-        loadSignals();
+    const payload = {
+        pair: document.getElementById("pair").value,
+        entry: document.getElementById("entry").value,
+        tp: document.getElementById("tp").value,
+        sl: document.getElementById("sl").value,
+        plan: "monthly",          // ✅ REQUIRED
+        lots: collectLots()
     };
+
+    const url = editingSignalId
+        ? `${API_BASE}/admin/signals/${editingSignalId}`
+        : `${API_BASE}/admin/signals`;
+
+    const method = editingSignalId ? "PUT" : "POST";
+
+    const res = await fetch(url, {
+        method,
+        headers: authHeaders(),
+        body: JSON.stringify(payload)
+    });
+
+    if (!res.ok) {
+        const err = await res.json();
+        alert(err.message || "Failed to save signal");
+        return;
+    }
+
+    editingSignalId = null;
+    e.target.reset();
+    document.getElementById("lotRows").innerHTML = "";
+    loadSignals();
+};
 
     loadPendingUsers();
     loadActiveUsers();
@@ -319,5 +326,3 @@ document.addEventListener("DOMContentLoaded", () => {
 
 </body>
 </html>
-
-
