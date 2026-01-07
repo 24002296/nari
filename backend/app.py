@@ -278,7 +278,7 @@ def create_app():
         data = request.get_json() or {}
 
         # ---------------- UPDATE SIGNAL FIELDS ----------------
-        allowed_fields = ["pair", "entry", "tp", "sl", "plan"]
+        allowed_fields = ["pair", "entry", "tp", "sl"]
 
         for field in allowed_fields:
             if field in data:
@@ -462,6 +462,7 @@ app = create_app()
 ensure_admin_user(app)
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
+
 
 
 
