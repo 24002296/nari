@@ -323,7 +323,7 @@ def create_app():
     def create_signal():
         data = request.get_json() or {}
 
-        required = ["pair", "entry", "tp", "sl", "plan"]
+        required = ["pair", "entry", "tp", "sl"]
         if not all(k in data for k in required):
             return jsonify({"message": "Missing fields"}), 400
 
@@ -332,7 +332,7 @@ def create_app():
             entry=data["entry"],
             tp=data["tp"],
             sl=data["sl"],
-            plan=data["plan"],
+            plan="monthly"
         )
 
         db.session.add(signal)
@@ -462,6 +462,7 @@ app = create_app()
 ensure_admin_user(app)
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
+
 
 
 
