@@ -200,7 +200,7 @@ def create_app():
                 "entry": s.entry,
                 "tp": s.tp,
                 "sl": s.sl,
-                "plan": s.plan
+                
             }
             for s in signals
         ]), 200
@@ -335,7 +335,7 @@ def create_app():
         if plan not in ALLOWED_PLANS:
             return jsonify({"message": "Invalid plan"}), 400
 
-        required = ["pair", "entry", "tp", "sl", "plan"]
+        required = ["pair", "entry", "tp", "sl"]
 
         if not all(k in data for k in required):
             return jsonify({"message": "Missing fields"}), 400
@@ -476,4 +476,5 @@ app = create_app()
 ensure_admin_user(app)
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
+
 
