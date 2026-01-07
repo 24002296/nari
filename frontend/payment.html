@@ -48,34 +48,41 @@ if (!token) {
 const plan = "monthly";
 const amount = 5000;
 
-// Example payment submit
-async function payNow() {
-    const res = await fetch("https://nari-15.onrender.com/api/subscribe", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + token
-        },
-        body: JSON.stringify({
-            plan,
-            amount
-        })
-    });
+const form = document.getElementById("paymentForm");
 
-    const data = await res.json();
+form.addEventListener("submit", async (e) => {
+    e.preventDefault(); // ⛔ STOP PAGE REFRESH
 
-    if (!res.ok) {
-        alert(data.message || "Payment failed");
-        return;
+    try {
+        const res = await fetch("https://nari-15.onrender.com/api/subscribe", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: "Bearer " + token
+            },
+            body: JSON.stringify({ plan })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+            alert(data.message || "Payment failed");
+            return;
+        }
+
+        alert("✅ Subscription activated!");
+        window.location.href = "page2.html";
+
+    } catch (err) {
+        console.error(err);
+        alert("Server error. Try again.");
     }
-
-    alert("Subscription activated!");
-    window.location.href = "page2.html";
-}
+});
 </script>
 
 
 </body>
 
 </html>
+
 
