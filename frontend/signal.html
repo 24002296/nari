@@ -46,39 +46,47 @@ async function loadSignals() {
     const container = document.getElementById("signalsContainer");
     container.innerHTML = "<p>Loading signals...</p>";
 
-    const res = await fetch(`${API_BASE}/signals`, {
-        headers: authHeaders()
-    });
+    try {
+        const res = await fetch(`${API_BASE}/signals`, {
+            headers: authHeaders()
+        });
 
-    if (!res.ok) {
-        container.innerHTML = "<p>Failed to load signals</p>";
-        return;
-    }
+        if (!res.ok) {
+            console.error("API error:", res.status);
+            container.innerHTML = "<p>Failed to load signals</p>";
+            return;
+        }
 
-    const signals = await res.json();
+        const signals = await res.json();
+        console.log("Signals:", signals);
 
-    if (signals.length === 0) {
-        container.innerHTML = "<p>No signals available</p>";
-        return;
-    }
+        if (!Array.isArray(signals) || signals.length === 0) {
+            container.innerHTML = "<p>No signals available</p>";
+            return;
+        }
 
-    container.innerHTML = "";
+        container.innerHTML = "";
 
-    signals.forEach(s => {
-        container.innerHTML += `
-            <div class="signal-card" onclick="toggleLots(${s.id})">
-                <h3>${s.pair}</h3>
-                <p>Entry: ${s.entry}</p>
-                <p>TP: ${s.tp}</p>
-                <p>SL: ${s.sl}</p>
+        signals.forEach(s => {
+            container.innerHTML += `
+                <div class="signal-card" onclick="toggleLots(${s.id})">
+                    <h3>${s.pair}</h3>
+                    <p>Entry: ${s.entry}</p>
+                    <p>TP: ${s.tp}</p>
+                    <p>SL: ${s.sl}</p>
 
-                <div class="lot-box" id="lots-${s.id}" style="display:none">
-                    ${renderLots(s.lots)}
+                    <div class="lot-box" id="lots-${s.id}" style="display:none">
+                        ${renderLots(s.lots)}
+                    </div>
                 </div>
-            </div>
-        `;
-    });
+            `;
+        });
+    } catch (err) {
+        console.error(err);
+        container.innerHTML = "<p>Error loading signals</p>";
+    }
 }
+
 
 function renderLots(lots) {
     if (!lots || lots.length === 0) {
@@ -107,3 +115,4 @@ document.addEventListener("DOMContentLoaded", loadSignals);
 
 
 </html>
+
