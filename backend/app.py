@@ -13,8 +13,10 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from auth import generate_token, login_required, admin_required
 from mailer import mail
 from flask_jwt_extended import (
-   
-    create_access_token
+    JWTManager,
+    create_access_token,
+    jwt_required,
+    get_jwt_identity
 )
 
 
@@ -484,6 +486,7 @@ app = create_app()
 ensure_admin_user(app)
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
+
 
 
 
