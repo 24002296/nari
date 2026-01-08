@@ -9,7 +9,7 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from dotenv import load_dotenv
 from werkzeug.security import generate_password_hash, check_password_hash
-
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from auth import generate_token, login_required, admin_required
 from mailer import mail
 from flask_jwt_extended import (
@@ -179,15 +179,23 @@ def create_app():
 
 
     # ---------------- CURRENT USER ----------------
+
+
     @app.get("/api/me")
-    @login_required
+    @jwt_required()
     def me():
-        user = request.current_user
+        user_id = get_jwt_identity()
+        user = User.query.get_or_404(user_id)
+    
         return jsonify({
             "id": user.id,
             "email": user.email,
-            "subscription_end": user.subscription_end.isoformat() if user.subscription_end else None
-        })
+            "role": user.role,
+            "subscription_end": (
+                user.subscription_end.isoformat()
+                if user.subscription_end else None
+            )
+        }), 200
 
     # ---------------- SUBSCRIBE ----------------
     @app.post("/api/subscribe")
@@ -494,6 +502,7 @@ app = create_app()
 ensure_admin_user(app)
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
+
 
 
 
