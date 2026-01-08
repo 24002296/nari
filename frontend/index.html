@@ -75,10 +75,17 @@ loginForm.addEventListener("submit", async (e) => {
     const email = document.querySelector(".text").value.trim();
     const password = document.querySelector(".pass").value.trim();
 
+    if (!email || !password) {
+        alert("Please enter email and password");
+        return;
+    }
+
     try {
         const res = await fetch(`${API_URL}/api/login`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+                "Content-Type": "application/json"
+            },
             body: JSON.stringify({ email, password, role })
         });
 
@@ -92,13 +99,13 @@ loginForm.addEventListener("submit", async (e) => {
         // ✅ SAVE TOKEN
         localStorage.setItem("token", data.token);
 
-        // ✅ ADMIN
-        if (data.user.role === "admin") {
+        // ✅ ADMIN LOGIN
+        if (data.user?.role === "admin") {
             window.location.href = "admin.html";
             return;
         }
 
-        // ✅ CLIENT — SINGLE PLAN LOGIC ONLY
+        // ✅ CLIENT — SINGLE PLAN FLOW
         if (!data.user.subscription_end) {
             window.location.href = "userPlan.html";
             return;
@@ -120,10 +127,12 @@ loginForm.addEventListener("submit", async (e) => {
 });
 </script>
 
+
 </body>
 
 
 </html>
+
 
 
 
