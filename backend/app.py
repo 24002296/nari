@@ -374,17 +374,7 @@ def create_app():
     @app.get("/api/signals")
     @login_required
     def client_signals():
-        user = request.current_user
-    
-        if not user or not user.plan:
-            return jsonify([]), 200
-    
-        signals = (
-            Signal.query
-            .filter(Signal.plan == user.plan)
-            .order_by(Signal.created_at.desc())
-            .all()
-        )
+        signals = Signal.query.order_by(Signal.created_at.desc()).all()
     
         return jsonify([
             {
@@ -404,7 +394,7 @@ def create_app():
             }
             for s in signals
         ])
-
+    
 
     @app.delete("/api/admin/signals/<int:id>")
     @admin_required
@@ -475,6 +465,7 @@ app = create_app()
 ensure_admin_user(app)
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
+
 
 
 
