@@ -237,11 +237,13 @@ async function deleteSignal(id) {
 
 function editSignal(id, pair, entry, tp, sl) {
     editingSignalId = id;
-    pair.value = pair;
-    entry.value = entry;
-    tp.value = tp;
-    sl.value = sl;
+
+    document.getElementById("pair").value = pair;
+    document.getElementById("entry").value = entry;
+    document.getElementById("tp").value = tp;
+    document.getElementById("sl").value = sl;
 }
+
 
 /* ===============================
    LOT SIZES
@@ -326,4 +328,5 @@ document.getElementById("signalForm").onsubmit = async e => {
 
 </body>
 </html>
+
 
