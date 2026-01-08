@@ -96,11 +96,29 @@
 /* ===============================
    CONFIG
 ================================ */
+
 const API_BASE = "https://nari-15.onrender.com/api";
 const token = localStorage.getItem("token");
 
 if (!token) {
     alert("Not logged in");
+    window.location.href = "index.html";
+}
+
+/* 🔐 ADMIN TOKEN CHECK */
+function parseJwt(token) {
+    try {
+        return JSON.parse(atob(token.split(".")[1]));
+    } catch {
+        return null;
+    }
+}
+
+const decoded = parseJwt(token);
+
+if (!decoded || decoded.role !== "admin") {
+    alert("Admin access only");
+    localStorage.clear();
     window.location.href = "index.html";
 }
 
@@ -110,6 +128,7 @@ function authHeaders() {
         "Authorization": "Bearer " + token
     };
 }
+
 
 /* ===============================
    USERS
@@ -122,10 +141,16 @@ async function loadPendingUsers() {
         headers: authHeaders()
     });
 
+    if (!res.ok) {
+        const err = await res.json();
+        tbody.innerHTML = `<tr><td colspan="4">${err.message || "Unauthorized"}</td></tr>`;
+        return;
+    }
+
     const users = await res.json();
     tbody.innerHTML = "";
 
-    if (users.length === 0) {
+    if (!Array.isArray(users) || users.length === 0) {
         tbody.innerHTML = "<tr><td colspan='4'>No pending users</td></tr>";
         return;
     }
@@ -142,6 +167,7 @@ async function loadPendingUsers() {
     });
 }
 
+
 async function loadActiveUsers() {
     const tbody = document.getElementById("activeUsersBody");
     tbody.innerHTML = "<tr><td colspan='4'>Loading...</td></tr>";
@@ -150,10 +176,16 @@ async function loadActiveUsers() {
         headers: authHeaders()
     });
 
+    if (!res.ok) {
+        const err = await res.json();
+        tbody.innerHTML = `<tr><td colspan="4">${err.message || "Unauthorized"}</td></tr>`;
+        return;
+    }
+
     const users = await res.json();
     tbody.innerHTML = "";
 
-    if (users.length === 0) {
+    if (!Array.isArray(users) || users.length === 0) {
         tbody.innerHTML = "<tr><td colspan='4'>No active users</td></tr>";
         return;
     }
@@ -163,7 +195,7 @@ async function loadActiveUsers() {
             <tr>
                 <td>${u.name}</td>
                 <td>${u.email}</td>
-                <td>${u.subscription_end || "-"}</td>
+                <td>${u.expiry || "-"}</td>
                 <td>
                     ${
                         u.is_active
@@ -171,7 +203,6 @@ async function loadActiveUsers() {
                         : `<button onclick="reactivateUser(${u.id})">Reactivate</button>`
                     }
                 </td>
-
             </tr>
         `;
     });
@@ -368,6 +399,7 @@ document.getElementById("signalForm").onsubmit = async e => {
 
 </body>
 </html>
+
 
 
 
