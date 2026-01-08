@@ -13,10 +13,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from auth import generate_token, login_required, admin_required
 from mailer import mail
 from flask_jwt_extended import (
-    JWTManager,
-    create_access_token,
-    jwt_required,
-    get_jwt_identity
+   
+    create_access_token
 )
 
 
