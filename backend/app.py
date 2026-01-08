@@ -98,25 +98,35 @@ def create_app():
 
         email = data.get("email")
         password = data.get("password")
-        role = data.get("role")
+        role = data.get("role")  # optional: "admin" or "client"
 
         if not email or not password:
             return jsonify({"message": "Missing credentials"}), 400
 
         user = User.query.filter_by(email=email).first()
 
-        if not user:
+        if not user or not check_password_hash(user.password_hash, password):
             return jsonify({"message": "Invalid credentials"}), 401
 
-        if not check_password_hash(user.password_hash, password):
-            return jsonify({"message": "Invalid credentials"}), 401
+        # 🔒 BLOCK DEACTIVATED USERS
+        if not user.is_active:
+            return jsonify({
+                "message": (
+                    "Your account is temporarily deactivated. "
+                    "Please wait for reactivation or contact our management team."
+                )
+            }), 403
 
         # 🔐 ADMIN LOGIN
         if role == "admin":
             if user.role != "admin":
                 return jsonify({"message": "Not an admin account"}), 403
 
-            token = generate_token(user.id, "admin")
+            token = create_access_token(
+                identity=user.id,
+                additional_claims={"role": "admin"}
+            )
+
             return jsonify({
                 "token": token,
                 "user": {
@@ -133,21 +143,24 @@ def create_app():
         if user.approved is not True:
             return jsonify({"message": "Account pending approval"}), 403
 
-        token = generate_token(user.id, "client")
+        token = create_access_token(
+            identity=user.id,
+            additional_claims={"role": "client"}
+        )
 
         return jsonify({
             "token": token,
             "user": {
                 "id": user.id,
                 "email": user.email,
-               
                 "role": "client",
-                "approved": user.approved,   # ✅ ADD THIS
-               
-                "subscription_end": user.subscription_end.isoformat() if user.subscription_end else None
+                "approved": user.approved,
+                "subscription_end": (
+                    user.subscription_end.isoformat()
+                    if user.subscription_end else None
+                )
             }
         }), 200
-
 
 
 
@@ -248,6 +261,7 @@ def create_app():
             "id": u.id,
             "name": u.name,
             "email": u.email,
+            "is_active": u.is_active,
             "subscription_active": bool(
                 u.subscription_end and u.subscription_end > datetime.utcnow()
             ),
@@ -413,19 +427,20 @@ def create_app():
     @app.put("/api/admin/users/<int:user_id>/deactivate")
     @admin_required
     def deactivate_user(user_id):
-            user = User.query.get_or_404(user_id)
+        user = User.query.get_or_404(user_id)
+        user.is_active = False
+        db.session.commit()
+        return jsonify({"message": "User deactivated"})
 
-            user.is_active = False
-            user.subscription_end = None
-           
-
-            db.session.commit()
-
-            return jsonify({"message": "User deactivated"})
-    
+    @app.put("/api/admin/users/<int:user_id>/reactivate")
+    @admin_required
+    def reactivate_user(user_id):
+        user = User.query.get_or_404(user_id)
+        user.is_active = True
+        db.session.commit()
+        return jsonify({"message": "User reactivated"})
 
     return app
-
 
 # ---------------- ADMIN BOOTSTRAP ----------------
 def ensure_admin_user(app):
@@ -465,6 +480,7 @@ app = create_app()
 ensure_admin_user(app)
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
+
 
 
 
