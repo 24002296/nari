@@ -30,6 +30,13 @@ def create_app():
     # ---------------- BASIC CONFIG ----------------
     app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "dev_secret")
     app.config["JWT_EXP_SECONDS"] = int(os.getenv("JWT_EXP_SECONDS", "86400"))
+    
+
+    app.config["JWT_SECRET_KEY"] = os.environ.get(
+        "JWT_SECRET_KEY", "dev-secret-change-me"
+    )
+
+    jwt = JWTManager(app)
 
     # ---------------- DATABASE ----------------
 # ---------------- DATABASE ----------------
@@ -486,11 +493,5 @@ app = create_app()
 ensure_admin_user(app)
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
-
-
-
-
-
-
 
 
