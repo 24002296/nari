@@ -325,58 +325,51 @@ def create_app():
             "message": "Signal updated successfully",
             "signal_id": signal.id
         }), 200
-
+    
     @app.post("/api/admin/signals")
     @admin_required
     def create_signal():
         data = request.get_json() or {}
-        plan = data.get("plan")
-
-        if plan not in ALLOWED_PLANS:
-            return jsonify({"message": "Invalid plan"}), 400
-
+    
         required = ["pair", "entry", "tp", "sl"]
-
-        if not all(k in data for k in required):
+        if not all(k in data and data[k] for k in required):
             return jsonify({"message": "Missing fields"}), 400
-
+    
         signal = Signal(
             pair=data["pair"],
             entry=data["entry"],
             tp=data["tp"],
             sl=data["sl"],
-           
         )
-
-
+    
         db.session.add(signal)
-        db.session.flush()  # IMPORTANT — get signal.id before commit
-
-        # ---------------- LOT SIZES ----------------
+        db.session.flush()
+    
         lots = data.get("lots", [])
-
+    
         if lots:
             if not isinstance(lots, list):
                 return jsonify({"message": "Lots must be a list"}), 400
-
+    
             if len(lots) > 3:
                 return jsonify({"message": "Maximum 3 lot sizes allowed"}), 400
-
+    
             for lot in lots:
                 required_lot = ["lot_size", "win_amount", "loss_amount"]
-                if not all(k in lot for k in required_lot):
+                if not all(k in lot and lot[k] for k in required_lot):
                     return jsonify({"message": "Invalid lot structure"}), 400
-
+    
                 db.session.add(SignalLot(
                     signal_id=signal.id,
                     lot_size=float(lot["lot_size"]),
                     win_amount=float(lot["win_amount"]),
                     loss_amount=float(lot["loss_amount"])
                 ))
-
+    
         db.session.commit()
-
+    
         return jsonify({"message": "Signal created", "id": signal.id}), 201
+
 
     @app.get("/api/signals")
     @login_required
@@ -476,5 +469,6 @@ app = create_app()
 ensure_admin_user(app)
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
+
 
 
