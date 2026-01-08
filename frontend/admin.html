@@ -194,16 +194,29 @@ let editingSignalId = null;
 
 async function loadSignals() {
     const tbody = document.getElementById("signalTableBody");
+
+    if (!tbody) {
+        console.error("signalTableBody not found");
+        return;
+    }
+
     tbody.innerHTML = "<tr><td colspan='5'>Loading...</td></tr>";
 
     const res = await fetch(`${API_BASE}/admin/signals`, {
         headers: authHeaders()
     });
 
+    if (!res.ok) {
+        tbody.innerHTML = "<tr><td colspan='5'>Failed to load signals</td></tr>";
+        return;
+    }
+
     const signals = await res.json();
+    console.log("Signals from API:", signals);
+
     tbody.innerHTML = "";
 
-    if (signals.length === 0) {
+    if (!Array.isArray(signals) || signals.length === 0) {
         tbody.innerHTML = "<tr><td colspan='5'>No signals</td></tr>";
         return;
     }
@@ -223,6 +236,7 @@ async function loadSignals() {
         `;
     });
 }
+
 
 async function deleteSignal(id) {
     if (!confirm("Delete signal?")) return;
@@ -328,5 +342,6 @@ document.getElementById("signalForm").onsubmit = async e => {
 
 </body>
 </html>
+
 
 
