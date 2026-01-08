@@ -164,7 +164,14 @@ async function loadActiveUsers() {
                 <td>${u.name}</td>
                 <td>${u.email}</td>
                 <td>${u.subscription_end || "-"}</td>
-                <td><button onclick="deactivateUser(${u.id})">Deactivate</button></td>
+                <td>
+                    ${
+                        u.is_active
+                        ? `<button onclick="deactivateUser(${u.id})">Deactivate</button>`
+                        : `<button onclick="reactivateUser(${u.id})">Reactivate</button>`
+                    }
+                </td>
+
             </tr>
         `;
     });
@@ -247,6 +254,25 @@ async function deleteSignal(id) {
     });
 
     loadSignals();
+}
+async function deactivateUser(id) {
+    if (!confirm("Deactivate this user?")) return;
+
+    await fetch(`${API_BASE}/admin/users/${id}/deactivate`, {
+        method: "PUT",
+        headers: authHeaders()
+    });
+
+    loadActiveUsers();
+}
+
+async function reactivateUser(id) {
+    await fetch(`${API_BASE}/admin/users/${id}/reactivate`, {
+        method: "PUT",
+        headers: authHeaders()
+    });
+
+    loadActiveUsers();
 }
 
 function editSignal(id, pair, entry, tp, sl) {
@@ -342,6 +368,8 @@ document.getElementById("signalForm").onsubmit = async e => {
 
 </body>
 </html>
+
+
 
 
 
