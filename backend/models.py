@@ -14,7 +14,8 @@ class User(db.Model):
     password_hash = db.Column(db.String(200), nullable=False)
     approved = db.Column(db.Boolean, default=False)
     role = db.Column(db.String(20), default="client")
-
+    
+    is_active = db.Column(db.Boolean, default=True)
     subscription_start = db.Column(db.DateTime)
     subscription_end = db.Column(db.DateTime)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
@@ -49,3 +50,4 @@ class SignalLot(db.Model):
     lot_size = db.Column(db.Float, nullable=False)
     win_amount = db.Column(db.Float, nullable=False)
     loss_amount = db.Column(db.Float, nullable=False)
+
