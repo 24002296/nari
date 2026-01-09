@@ -403,9 +403,10 @@ def create_app():
 
 
     @app.get("/api/signals")
-    @login_required
-    def client_signals():
-        signals = Signal.query.order_by(Signal.created_at.desc()).all()
+    @jwt_required()
+    def get_signals():
+        user_id = get_jwt_identity()
+        user = User.query.get_or_404(user_id)
     
         return jsonify([
             {
@@ -497,6 +498,7 @@ app = create_app()
 ensure_admin_user(app)
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
+
 
 
 
