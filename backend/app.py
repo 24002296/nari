@@ -5,6 +5,9 @@ from datetime import datetime, timedelta
 from urllib.parse import quote_plus
 from models import db, User, Signal, SignalLot
 
+
+from mailer import send_new_signal_email
+from flask_mail import Mail
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from dotenv import load_dotenv
@@ -44,12 +47,21 @@ def create_app():
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
     # ---------------- MAIL ----------------
-    app.config["MAIL_SERVER"] = os.getenv("SMTP_HOST")
-    app.config["MAIL_PORT"] = int(os.getenv("SMTP_PORT", "587"))
-    app.config["MAIL_USERNAME"] = os.getenv("SMTP_USER")
-    app.config["MAIL_PASSWORD"] = os.getenv("SMTP_PASS")
+
+
+
+    # =========================
+    # MAIL CONFIG
+    # =========================
+    app.config["MAIL_SERVER"] = "smtp.gmail.com"
+    app.config["MAIL_PORT"] = 587
     app.config["MAIL_USE_TLS"] = True
-    app.config["MAIL_DEFAULT_SENDER"] = os.getenv("MAIL_FROM")
+    app.config["MAIL_USERNAME"] = os.getenv("MAIL_USERNAME")
+    app.config["MAIL_PASSWORD"] = os.getenv("MAIL_PASSWORD")
+    app.config["MAIL_DEFAULT_SENDER"] = os.getenv("MAIL_USERNAME")
+ 
+   
+
 
     # ---------------- INIT ----------------
     
@@ -72,7 +84,7 @@ def create_app():
             ]
         }
     })
-
+    
 
     # ---------------- HEALTH ----------------
     @app.get("/api/ping")
@@ -399,6 +411,13 @@ def create_app():
     
         db.session.commit()
     
+
+        users = User.query.filter_by(is_active=True).all()
+        emails = [u.email for u in users]
+
+        send_new_signal_email(emails)
+
+    
         return jsonify({"message": "Signal created", "id": signal.id}), 201
 
     @app.get("/api/signals")
@@ -427,19 +446,18 @@ def create_app():
             }
             for s in signals
         ])
-    
-        @app.delete("/api/admin/signals/<int:id>")
-        @admin_required
-        def delete_signal(id):
-            signal = Signal.query.get_or_404(id)
-    
-            # IMPORTANT: delete lots first if relationship exists
-            for lot in signal.lots:
-                db.session.delete(lot)
-    
+    @app.delete("/api/admin/signals/<int:id>")
+    @admin_required
+    def delete_signal(id):
+        signal = Signal.query.get_or_404(id)
+        
+        # IMPORTANT: delete lots first if relationship exists
+        for lot in signal.lots:
+            db.session.delete(lot)
+        
             db.session.delete(signal)
             db.session.commit()
-    
+        
             return jsonify({"message": "Deleted"}), 200
     
     @app.put("/api/admin/users/<int:user_id>/deactivate")
@@ -498,13 +516,3 @@ app = create_app()
 ensure_admin_user(app)
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
-
-
-
-
-
-
-
-
-
-
