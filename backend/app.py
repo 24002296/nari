@@ -198,26 +198,21 @@ def create_app():
         }), 200
 
     # ---------------- SUBSCRIBE ----------------
+
     @app.post("/api/subscribe")
-    @login_required
+    @jwt_required()
     def subscribe():
-        user = request.current_user
-        data = request.get_json() or {}
-
-        plan = data.get("plan")
-
-        if plan not in ALLOWED_PLANS:
-            return jsonify({"message": "Invalid plan"}), 400
-
-        user.plan = plan
-        user.subscription_start = datetime.utcnow()
+        user_id = get_jwt_identity()
+        user = User.query.get_or_404(user_id)
+    
+        # example: 30-day subscription
         user.subscription_end = datetime.utcnow() + timedelta(days=30)
-
+        user.plan = "premium"
+    
         db.session.commit()
-
+    
         return jsonify({
             "message": "Subscription activated",
-            "plan": user.plan,
             "subscription_end": user.subscription_end.isoformat()
         }), 200
 
@@ -502,6 +497,7 @@ app = create_app()
 ensure_admin_user(app)
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
+
 
 
 
