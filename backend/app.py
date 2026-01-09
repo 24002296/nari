@@ -402,11 +402,32 @@ def create_app():
         return jsonify({"message": "Signal created", "id": signal.id}), 201
 
 
+from datetime import datetime
+from flask_jwt_extended import jwt_required, get_jwt_identity
+
     @app.get("/api/signals")
     @jwt_required()
     def get_signals():
         user_id = get_jwt_identity()
         user = User.query.get_or_404(user_id)
+    
+        # 🚫 Deactivated user
+        if not user.is_active:
+            return jsonify({
+                "message": "Your account is temporarily deactivated. Please wait for reactivation or contact our team."
+            }), 403
+    
+        # 👑 Admin sees all
+        if user.role == "admin":
+            signals = Signal.query.order_by(Signal.created_at.desc()).all()
+        else:
+            # 💳 Subscription check
+            if not user.subscription_end or user.subscription_end < datetime.utcnow():
+                return jsonify({"message": "Subscription required"}), 401
+    
+            signals = Signal.query.filter_by(active=True)\
+                                  .order_by(Signal.created_at.desc())\
+                                  .all()
     
         return jsonify([
             {
@@ -426,7 +447,7 @@ def create_app():
             }
             for s in signals
         ])
-    
+
 
     @app.delete("/api/admin/signals/<int:id>")
     @admin_required
@@ -498,6 +519,7 @@ app = create_app()
 ensure_admin_user(app)
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
+
 
 
 
