@@ -2,16 +2,19 @@
 from flask_mail import Mail, Message
 from flask import current_app
 
-mail = Mail()
+from flask_mail import Message
+from app import mail   # ✅ IMPORT, DO NOT RECREATE
 
-def send_email(to_email, subject, html_body):
-    try:
-        msg = Message(subject,
-                      sender=(current_app.config['MAIL_FROM_NAME'], current_app.config['MAIL_FROM']),
-                      recipients=[to_email])
-        msg.html = html_body
-        mail.send(msg)
-        return True
-    except Exception as e:
-        current_app.logger.error("Mail send error: %s", str(e))
-        return False
+def send_new_signal_email(recipients):
+    msg = Message(
+        subject="📢 New Signal Available",
+        recipients=recipients,
+        body=(
+            "Hello,\n\n"
+            "A new trading signal has just been posted by the admin.\n"
+            "Please log in to your account to view it.\n\n"
+            "Regards,\n"
+            "NARI Team"
+        )
+    )
+    mail.send(msg)
