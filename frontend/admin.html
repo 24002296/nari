@@ -195,7 +195,8 @@ async function loadActiveUsers() {
             <tr>
                 <td>${u.name}</td>
                 <td>${u.email}</td>
-                <td>${u.expiry || "-"}</td>
+                <td>${formatDate(user.expiry)}</td>
+
                 <td>
                     ${
                         u.is_active
@@ -207,7 +208,20 @@ async function loadActiveUsers() {
         `;
     });
 }
+function formatDate(isoString) {
+    if (!isoString) return "—";
 
+    const date = new Date(isoString);
+
+    return date.toLocaleString("en-ZA", {
+        year: "numeric",
+        month: "short",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false
+    });
+}
 async function approveUser(id) {
     await fetch(`${API_BASE}/admin/users/${id}/approve`, {
         method: "PUT",
@@ -396,9 +410,9 @@ document.getElementById("signalForm").onsubmit = async e => {
     loadSignals();
 });
 </script>
-
 </body>
 </html>
+
 
 
 
