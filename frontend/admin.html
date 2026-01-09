@@ -195,8 +195,7 @@ async function loadActiveUsers() {
             <tr>
                 <td>${u.name}</td>
                 <td>${u.email}</td>
-                <td>${formatDate(user.expiry)}</td>
-
+                <td>${formatDate(u.expiry)}</td>
                 <td>
                     ${
                         u.is_active
@@ -207,6 +206,7 @@ async function loadActiveUsers() {
             </tr>
         `;
     });
+
 }
 function formatDate(isoString) {
     if (!isoString) return "—";
@@ -412,6 +412,7 @@ document.getElementById("signalForm").onsubmit = async e => {
 </script>
 </body>
 </html>
+
 
 
 
