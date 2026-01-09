@@ -5,6 +5,9 @@ from datetime import datetime, timedelta
 from urllib.parse import quote_plus
 from models import db, User, Signal, SignalLot
 
+from itsdangerous import URLSafeTimedSerializer
+from flask_mail import Message
+
 
 from mailer import send_new_signal_email
 from flask_mail import Mail
@@ -61,7 +64,7 @@ def create_app():
     app.config["MAIL_DEFAULT_SENDER"] = os.getenv("MAIL_USERNAME")
  
    
-
+    serializer = URLSafeTimedSerializer(app.config["SECRET_KEY"])
 
     # ---------------- INIT ----------------
     
@@ -208,6 +211,30 @@ def create_app():
                 if user.subscription_end else None
             )
         }), 200
+
+
+    @app.post("/api/forgot-password")
+    def forgot_password():
+        data = request.get_json() or {}
+        email = data.get("email")
+    
+        user = User.query.filter_by(email=email).first()
+        if not user:
+            return jsonify({"message": "Email not registered"}), 404
+    
+        token = serializer.dumps(email, salt="password-reset")
+    
+        reset_link = f"https://nari3.netlify.app/newpass.html?token={token}"
+    
+        msg = Message(
+            subject="Password Reset",
+            recipients=[email],
+            body=f"Click the link to reset your password:\n{reset_link}"
+        )
+    
+        mail.send(msg)
+    
+        return jsonify({"message": "Reset link sent"}), 200
 
     # ---------------- SUBSCRIBE ----------------
 
@@ -516,3 +543,4 @@ app = create_app()
 ensure_admin_user(app)
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
+
