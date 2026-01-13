@@ -1,87 +1,85 @@
-<!DOCTYPE html>
+!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style3.css">
-    <title>Reset Password</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Reset Password</title>
+  <link rel="stylesheet" href="style3.css">
 </head>
 <body>
 
-<form id="resetForm">
-    <video class="backgroudvideo" autoplay loop>
-        <source src="video2.mp4" type="video/mp4">
-    </video>
+<div class="container">
+  <div class="card">
 
-    <div class="overlay">
-        <h3>BERLIN ENTERPRISE</h3>
+    <div class="motto">HU DIVHA VHALIMI</div>
 
-        <div class="main">
-            <div class="topic">
-                <h2>New Password</h2>
-            </div>
+    <h1>Reset Password</h1>
+    <p class="subtitle">
+      Create a new secure password for your account.
+    </p>
 
-            <div class="sub">
-                <p>Please create a new password that you don't use on any other site</p>
-            </div>
+    <form id="resetForm">
+      <input 
+        type="password" 
+        id="password" 
+        placeholder="New password" 
+        required 
+      />
 
-            <div class="box1">
-                <input id="newpass" class="newpass" type="password" placeholder="New password" required>
-                <br>
-                <input id="confpass" class="confpass" type="password" placeholder="Confirm password" required>
-                <br>
-            </div>
+      <input 
+        type="password" 
+        id="confirmPassword" 
+        placeholder="Confirm new password" 
+        required 
+      />
 
-            <button class="submit" type="submit">Submit</button>
-        </div>
-    </div>
-</form>
+      <button type="submit">Update Password</button>
+    </form>
+
+    <p class="disclaimer">
+      Trading involves risk. This platform is for educational purposes only.
+    </p>
+
+    <p class="back">
+      <a href="login.html">← Back to login</a>
+    </p>
+
+  </div>
+</div>
 
 <script>
+document.getElementById("resetForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
 
-document.getElementById("resetForm").addEventListener("submit", function(e){
-    e.preventDefault();
+  const password = document.getElementById("password").value;
+  const confirm = document.getElementById("confirmPassword").value;
 
-    let newPass = document.getElementById("newpass").value;
-    let confPass = document.getElementById("confpass").value;
+  if (password !== confirm) {
+    alert("Passwords do not match");
+    return;
+  }
 
-    if (newPass !== confPass) {
-        alert("Passwords do not match!");
-        return;
-    }
+  const token = new URLSearchParams(window.location.search).get("token");
 
-    
-    let email = localStorage.getItem("resetEmail");
-    if (!email) {
-        alert("Session expired. Restart password reset.");
-        window.location.href = "password.html";
-        return;
-    }
-
-    
-    let users = JSON.parse(localStorage.getItem("users")) || [];
-
-    
-    users = users.map(user => {
-        if (user.email === email) {
-            user.password = newPass;
-        }
-        return user;
+  try {
+    const res = await fetch("https://nari-15.onrender.com/api/reset-password", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token, password })
     });
 
-    
-    localStorage.setItem("users", JSON.stringify(users));
+    const data = await res.json();
+    alert(data.message || "Password updated successfully");
 
-    
-    localStorage.removeItem("resetEmail");
+    if (res.ok) {
+      window.location.href = "index.html";
+    }
 
-    alert("Password successfully changed! Please log in.");
-
-    
-    window.location.href = "index.html";
+  } catch {
+    alert("Reset link is invalid or expired");
+  }
 });
 </script>
 
-
 </body>
-
 </html>
