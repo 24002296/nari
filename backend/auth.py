@@ -8,7 +8,12 @@ from models import User
 from functools import wraps
 from flask import jsonify
 from flask_jwt_extended import verify_jwt_in_request, get_jwt
-
+from flask import Blueprint, request, jsonify
+from datetime import datetime, timedelta
+import secrets
+from werkzeug.security import generate_password_hash
+from mailer import send_email
+from models import User, db
 SECRET = os.getenv("SECRET_KEY", "dev_secret")
 JWT_EXP = int(os.getenv("JWT_EXP_SECONDS", "86400"))
 
@@ -29,6 +34,64 @@ def _get_token():
     if auth.startswith("Bearer "):
         return auth.split(" ", 1)[1]
     return auth
+
+
+
+auth_bp = Blueprint("auth", __name__)
+
+@auth_bp.route("/forgot-password", methods=["POST"])
+def forgot_password():
+    data = request.json
+    email = data.get("email")
+
+    user = User.query.filter_by(email=email).first()
+
+    if not user:
+        return jsonify({"message": "If email exists, a reset link was sent"}), 200
+
+    token = secrets.token_urlsafe(32)
+    user.reset_token = token
+    user.reset_token_expiry = datetime.utcnow() + timedelta(minutes=30)
+
+    db.session.commit()
+
+    reset_link = f"https://yourfrontend.com/reset-password.html?token={token}"
+
+    send_email(
+        to=email,
+        subject="Password Reset",
+        body=f"""
+Hello,
+
+Click the link below to reset your password.
+This link expires in 30 minutes.
+
+{reset_link}
+
+If you did not request this, ignore this email.
+"""
+    )
+
+    return jsonify({"message": "Reset link sent"}), 200
+
+@auth_bp.route("/reset-password", methods=["POST"])
+def reset_password():
+    data = request.json
+    token = data.get("token")
+    new_password = data.get("password")
+
+    user = User.query.filter_by(reset_token=token).first()
+
+    if not user or user.reset_token_expiry < datetime.utcnow():
+        return jsonify({"message": "Invalid or expired token"}), 400
+
+    user.password = generate_password_hash(new_password)
+    user.reset_token = None
+    user.reset_token_expiry = None
+
+    db.session.commit()
+
+    return jsonify({"message": "Password reset successful"}), 200
 
 
 def login_required(fn):
