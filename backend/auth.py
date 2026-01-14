@@ -9,7 +9,7 @@ from functools import wraps
 from flask import jsonify
 from flask_jwt_extended import verify_jwt_in_request, get_jwt
 from flask import Blueprint, request, jsonify
-from datetime import datetime, timedelta
+from mailer import send_reset_email
 import secrets
 from werkzeug.security import generate_password_hash
 from mailer import send_email
@@ -17,6 +17,8 @@ from models import User, db
 SECRET = os.getenv("SECRET_KEY", "dev_secret")
 JWT_EXP = int(os.getenv("JWT_EXP_SECONDS", "86400"))
 
+
+auth_bp = Blueprint("auth", __name__)
 
 def generate_token(user_id, role):
     payload = {
@@ -39,60 +41,41 @@ def _get_token():
 
 auth_bp = Blueprint("auth", __name__)
 
-@auth_bp.route("/forgot-password", methods=["POST"])
+
+@auth_bp.post("/api/forgot-password")
 def forgot_password():
-    data = request.json
-    email = data.get("email")
+    email = request.json.get("email")
 
     user = User.query.filter_by(email=email).first()
-
     if not user:
-        return jsonify({"message": "If email exists, a reset link was sent"}), 200
+        return jsonify({"message": "If email exists, reset link sent"}), 200
 
     token = secrets.token_urlsafe(32)
     user.reset_token = token
     user.reset_token_expiry = datetime.utcnow() + timedelta(minutes=30)
-
     db.session.commit()
 
-    reset_link = f"https://yourfrontend.com/reset-password.html?token={token}"
-
-    send_email(
-        to=email,
-        subject="Password Reset",
-        body=f"""
-Hello,
-
-Click the link below to reset your password.
-This link expires in 30 minutes.
-
-{reset_link}
-
-If you did not request this, ignore this email.
-"""
-    )
+    reset_link = f"https://nari3.netlify.app/newpass.html?token={token}"
+    send_reset_email(email, reset_link)
 
     return jsonify({"message": "Reset link sent"}), 200
 
-@auth_bp.route("/reset-password", methods=["POST"])
+
+@auth_bp.post("/api/reset-password")
 def reset_password():
-    data = request.json
-    token = data.get("token")
-    new_password = data.get("password")
+    token = request.json.get("token")
+    password = request.json.get("password")
 
     user = User.query.filter_by(reset_token=token).first()
-
     if not user or user.reset_token_expiry < datetime.utcnow():
         return jsonify({"message": "Invalid or expired token"}), 400
 
-    user.password = generate_password_hash(new_password)
+    user.password_hash = generate_password_hash(password)
     user.reset_token = None
     user.reset_token_expiry = None
-
     db.session.commit()
 
     return jsonify({"message": "Password reset successful"}), 200
-
 
 def login_required(fn):
     @wraps(fn)
