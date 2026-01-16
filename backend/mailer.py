@@ -34,24 +34,33 @@ def send_email(to, subject, body):
         server.send_message(msg)
 
 
-def send_reset_email(to, reset_link):
-    msg = Message(
-        subject="🔐 Password Reset Request",
-        recipients=[to],
-        body=f"""
-Hello,
+from flask_mail import Message
+from extensions import mail
+import threading
 
-You requested to reset your password.
+def send_reset_email_async(app, to, reset_link):
+    def send():
+        with app.app_context():
+            try:
+                msg = Message(
+                    subject="🔐 Password Reset",
+                    recipients=[to],
+                    body=f"""
+HU DIVHA VHALIMI
 
-Click the link below to set a new password:
+You requested a password reset.
+
+Reset your password using this link:
 {reset_link}
 
-This link will expire in 30 minutes.
+This link expires in 30 minutes.
 
-If you did not request this, please ignore this email.
-
-—
-NARI Team
+If you didn’t request this, ignore this email.
 """
-    )
-    mail.send(msg)
+                )
+                mail.send(msg)
+                print("✅ Reset email sent")
+            except Exception as e:
+                print("❌ Email failed:", e)
+
+    threading.Thread(target=send).start()
