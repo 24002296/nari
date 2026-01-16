@@ -8,16 +8,17 @@ from models import db, User, Signal, SignalLot
 from itsdangerous import URLSafeTimedSerializer
 from flask_mail import Message
 
+from extensions import mail
 
 from mailer import send_new_signal_email
-from flask_mail import Mail
+
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from dotenv import load_dotenv
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from auth import generate_token, login_required, admin_required
-from mailer import mail
+
 from flask_jwt_extended import (
     JWTManager,
     create_access_token,
@@ -543,4 +544,3 @@ app = create_app()
 ensure_admin_user(app)
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
-
