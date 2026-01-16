@@ -9,7 +9,8 @@ from functools import wraps
 from flask import jsonify
 from flask_jwt_extended import verify_jwt_in_request, get_jwt
 from flask import Blueprint, request, jsonify
-from mailer import send_reset_email
+from mailer import send_reset_email_async
+
 import secrets
 from werkzeug.security import generate_password_hash
 from mailer import send_email
@@ -119,3 +120,4 @@ def admin_required(fn):
             return jsonify({"message": "Invalid or missing token"}), 401
 
     return wrapper
+
