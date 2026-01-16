@@ -1,130 +1,114 @@
 
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
 }
 
 body {
-    font-family: "Poppins", Arial, sans-serif;
-    color: white;
-    background: #000;
+  min-height: 100vh;
+  background: radial-gradient(circle at top, #0a1a33, #020816);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
 }
 
-
-.backgroudvideo {
-    position: fixed;
-    top: 0; 
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    z-index: -1;
-    filter: brightness(70%);
+.container {
+  width: 100%;
+  padding: 20px;
 }
 
-.overlay {
-    width: 100%;
-    min-height: 100vh;
-    padding: 60px 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
+.card {
+  max-width: 430px;
+  margin: auto;
+  background: rgba(10, 20, 40, 0.85);
+  border-radius: 18px;
+  padding: 38px 32px;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(12px);
+  text-align: center;
 }
 
-.overlay h3 {
-    font-size: 30px;
-    font-weight: 600;
-    letter-spacing: 2px;
-    margin-bottom: 35px;
-    text-transform: uppercase;
-    color: #FFD700;
-    text-shadow: 0 0 8px rgba(255, 215, 0, 0.4);
+.motto {
+  font-size: 13px;
+  letter-spacing: 2px;
+  font-weight: 600;
+  color: #00d4ff;
+  margin-bottom: 15px;
+  text-transform: uppercase;
 }
 
-
-.main {
-    background: rgba(255, 255, 255, 0.08);
-    backdrop-filter: blur(8px);
-    padding: 35px;
-    border-radius: 15px;
-    width: 90%;
-    max-width: 380px;
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    box-shadow: 
-        0 10px 35px rgba(0,0,0,0.5),
-        inset 0 0 15px rgba(255,255,255,0.1);
+.card h1 {
+  font-size: 28px;
+  color: #ffffff;
+  margin-bottom: 10px;
 }
 
-.topic h2 {
-    font-size: 26px;
-    font-weight: 600;
-    margin-bottom: 8px;
+.subtitle {
+  font-size: 14px;
+  color: #b9d9ff;
+  margin-bottom: 26px;
 }
 
-.sub p {
-    font-size: 15px;
-    opacity: 0.9;
-    margin-bottom: 22px;
-    line-height: 1.4;
+input {
+  width: 100%;
+  padding: 14px;
+  border-radius: 10px;
+  border: 1px solid #1f3c68;
+  background: #08152b;
+  color: #fff;
+  outline: none;
+  margin-bottom: 18px;
+  font-size: 14px;
 }
 
-
-.box1 input {
-    width: 100%;
-    padding: 14px;
-    margin-bottom: 18px;
-    border-radius: 10px;
-    border: 1px solid rgba(255, 215, 0, 0.3);
-    background: rgba(255,255,255,0.12);
-    color: white;
-    font-size: 15px;
-    transition: 0.3s;
+input::placeholder {
+  color: #7aa8c7;
 }
 
-.box1 input::placeholder {
-    color: #ddd;
+button {
+  width: 100%;
+  padding: 14px;
+  border-radius: 50px;
+  border: none;
+  font-size: 15px;
+  font-weight: 600;
+  background: linear-gradient(135deg, #00d4ff, #0077ff);
+  color: #021028;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
 }
 
-.box1 input:focus {
-    border-color: #FFD700;
-    box-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
-    transform: scale(1.02);
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 30px rgba(0, 212, 255, 0.7);
 }
 
-.submit {
-    width: 100%;
-    background: linear-gradient(45deg, #FFD700, #ffcc33);
-    padding: 14px;
-    border: none;
-    border-radius: 10px;
-    font-size: 17px;
-    font-weight: bold;
-    color: black;
-    margin-top: 8px;
-    cursor: pointer;
-    transition: 0.3s;
-    letter-spacing: .5px;
+.disclaimer {
+  font-size: 11px;
+  color: #89a9c7;
+  margin-top: 20px;
 }
 
-.submit:hover {
-    background: linear-gradient(45deg, #ffdf66, #ffe793);
-    transform: translateY(-2px) scale(1.04);
-    box-shadow: 0 8px 20px rgba(255, 215, 0, 0.3);
+.back {
+  margin-top: 15px;
 }
 
+.back a {
+  color: #00d4ff;
+  font-size: 13px;
+  text-decoration: none;
+}
 
-@media (max-width: 600px) {
-    .overlay h3 {
-        font-size: 24px;
-    }
+.back a:hover {
+  text-decoration: underline;
+}
 
-    .main {
-        padding: 28px;
-    }
-
-    .submit {
-        padding: 13px;
-    }
+@media (max-width: 480px) {
+  .card {
+    padding: 30px 24px;
+  }
 }
