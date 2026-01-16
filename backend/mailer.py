@@ -33,3 +33,25 @@ def send_email(to, subject, body):
         server.login(EMAIL, PASSWORD)
         server.send_message(msg)
 
+
+def send_reset_email(to, reset_link):
+    msg = Message(
+        subject="🔐 Password Reset Request",
+        recipients=[to],
+        body=f"""
+Hello,
+
+You requested to reset your password.
+
+Click the link below to set a new password:
+{reset_link}
+
+This link will expire in 30 minutes.
+
+If you did not request this, please ignore this email.
+
+—
+NARI Team
+"""
+    )
+    mail.send(msg)
