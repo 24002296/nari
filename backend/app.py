@@ -81,7 +81,7 @@ def create_app():
     CORS(app, resources={
         r"/api/*": {
             "origins": [
-                "https://nari4.netlify.app",
+                "https://nari3.netlify.app",
                 "https://*.netlify.app",
                 "https://*.github.io",
                 "https://24002296.github.io"
@@ -225,7 +225,7 @@ def create_app():
     
         token = serializer.dumps(email, salt="password-reset")
     
-        reset_link = f"https://nari3.netlify.app/newpass.html?token={token}"
+        reset_link = f"https://nari4.netlify.app/newpass.html?token={token}"
     
         msg = Message(
             subject="Password Reset",
@@ -544,4 +544,3 @@ app = create_app()
 ensure_admin_user(app)
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
-
