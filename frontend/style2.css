@@ -1,94 +1,104 @@
-
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
 }
 
 body {
-    font-family: Arial, sans-serif;
-    background: #0d0d0d;
-    color: white;
-    display: flex;
-    justify-content: center;
-    padding-top: 60px;
+  min-height: 100vh;
+  background: radial-gradient(circle at top, #0a1a33, #020816);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
 }
 
-
-form {
-    width: 90%;
-    max-width: 380px;
-    background: rgba(255, 255, 255, 0.07);
-    padding: 28px;
-    border-radius: 15px;
-    text-align: center;
-    backdrop-filter: blur(5px);
-    border: 1px solid rgba(255, 255, 255, 0.15);
+.container {
+  width: 100%;
+  padding: 20px;
 }
 
-
-form h3 {
-    font-size: 26px;
-    font-weight: bold;
-    letter-spacing: 2px;
-    margin-bottom: 25px;
+.card {
+  max-width: 420px;
+  margin: auto;
+  background: rgba(10, 20, 40, 0.85);
+  border-radius: 18px;
+  padding: 35px 30px;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(12px);
+  text-align: center;
 }
 
-
-.topic h2 {
-    font-size: 22px;
-    margin-bottom: 8px;
+.card h1 {
+  font-size: 28px;
+  color: #00d4ff;
+  margin-bottom: 10px;
 }
 
-.sub p {
-    font-size: 14px;
-    opacity: 0.85;
-    margin-bottom: 20px;
+.subtitle {
+  font-size: 14px;
+  color: #b9d9ff;
+  margin-bottom: 25px;
 }
 
-
-.email {
-    width: 100%;
-    padding: 12px;
-    border-radius: 8px;
-    border: none;
-    outline: none;
-    font-size: 15px;
-    margin-bottom: 18px;
+input {
+  width: 100%;
+  padding: 14px;
+  border-radius: 10px;
+  border: 1px solid #1f3c68;
+  background: #08152b;
+  color: #fff;
+  outline: none;
+  margin-bottom: 18px;
+  font-size: 14px;
 }
 
-
-.continue {
-    width: 100%;
-    padding: 12px;
-    background: gold;
-    color: black;
-    font-weight: bold;
-    border-radius: 8px;
-    border: none;
-    cursor: pointer;
-    transition: 0.3s;
+input::placeholder {
+  color: #7aa8c7;
 }
 
-.continue:hover {
-    transform: scale(1.05);
-    background: #ffdf55;
+button {
+  width: 100%;
+  padding: 14px;
+  border-radius: 50px;
+  border: none;
+  font-size: 15px;
+  font-weight: 600;
+  background: linear-gradient(135deg, #00d4ff, #0077ff);
+  color: #021028;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
 }
 
-
-.continue a {
-    color: black;
-    text-decoration: none;
-    display: block;
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 30px rgba(0, 212, 255, 0.7);
 }
 
+.disclaimer {
+  font-size: 11px;
+  color: #89a9c7;
+  margin-top: 20px;
+}
 
-@media (max-width: 600px) {
-    form {
-        padding: 22px;
-    }
+.back {
+  margin-top: 15px;
+}
 
-    form h3 {
-        font-size: 22px;
-    }
+.back a {
+  color: #00d4ff;
+  font-size: 13px;
+  text-decoration: none;
+}
+
+.back a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 480px) {
+  .card {
+    padding: 28px 22px;
+  }
 }
