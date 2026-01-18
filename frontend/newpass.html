@@ -48,38 +48,36 @@
 </div>
 
 <script>
-document.getElementById("resetForm").addEventListener("submit", async (e) => {
+document.getElementById("forgotForm").addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const password = document.getElementById("password").value;
-  const confirm = document.getElementById("confirmPassword").value;
+  const email = document.getElementById("email").value.trim();
 
-  if (password !== confirm) {
-    alert("Passwords do not match");
+  if (!email) {
+    alert("Please enter your email");
     return;
   }
 
-  const token = new URLSearchParams(window.location.search).get("token");
-
   try {
-    const res = await fetch("https://nari-15.onrender.com/api/reset-password", {
+    const res = await fetch("https://nari-15.onrender.com/api/forgot-password", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ token, password })
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ email })
     });
 
     const data = await res.json();
-    alert(data.message || "Password updated successfully");
 
-    if (res.ok) {
-      window.location.href = "index.html";
-    }
+    alert(data.message || "If the email exists, a reset link has been sent");
 
-  } catch {
-    alert("Reset link is invalid or expired");
+  } catch (err) {
+    console.error(err);
+    alert("Server error. Try again later.");
   }
 });
 </script>
 
 </body>
 </html>
+
