@@ -81,7 +81,7 @@ def create_app():
     CORS(app, resources={
         r"/api/*": {
             "origins": [
-                "https://nari3.netlify.app",
+                "https://nari4.netlify.app",
                 "https://*.netlify.app",
                 "https://*.github.io",
                 "https://24002296.github.io"
@@ -544,3 +544,4 @@ app = create_app()
 ensure_admin_user(app)
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
+
