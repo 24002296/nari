@@ -477,16 +477,29 @@ def create_app():
     @app.delete("/api/admin/signals/<int:id>")
     @admin_required
     def delete_signal(id):
-        signal = Signal.query.get_or_404(id)
-        
-        # IMPORTANT: delete lots first if relationship exists
-        for lot in signal.lots:
-            db.session.delete(lot)
-        
+        try:
+            signal = Signal.query.get_or_404(id)
+
+            # delete all lots first
+            for lot in signal.lots:
+                db.session.delete(lot)
+
+            # then delete the signal
             db.session.delete(signal)
             db.session.commit()
-        
-            return jsonify({"message": "Deleted"}), 200
+
+            return jsonify({
+                "message": "Signal deleted successfully",
+                "deleted_id": id
+            }), 200
+
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({
+                "error": "Failed to delete signal",
+                "details": str(e)
+            }), 500
+
     
     @app.put("/api/admin/users/<int:user_id>/deactivate")
     @admin_required
@@ -544,4 +557,3 @@ app = create_app()
 ensure_admin_user(app)
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
-
